@@ -31,7 +31,7 @@ public class ProjectUtils {
 			System.out.println("Checking if application is up to date...");
 			
 			if (!newVersion.equalsIgnoreCase(Project.VERSION)) {
-				Project.isOutdated = true;
+				Project.newVersion = newVersion;
 				
 				System.err.println("A new version of this application has been released on " + Utils.formatTime(timestamp) + ": " + Project.NAME + " " + newVersion);
 				System.err.println("Download latest version on " + Utils.websiteDomain + "/" + Project.GAME_ID_REF + "/");

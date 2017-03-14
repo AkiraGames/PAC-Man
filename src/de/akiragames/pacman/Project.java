@@ -1,12 +1,15 @@
 package de.akiragames.pacman;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
 import de.akiragames.pacman.utils.ProjectUtils;
+import de.akiragames.pacman.utils.Utils;
 
 public class Project extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -21,7 +24,8 @@ public class Project extends Canvas implements Runnable {
 	public static final int HEIGHT = WIDTH / 4 * 3;
 	public static final int SCALE = 3;
 	
-	public static boolean isOutdated = false;
+	// Nur für Update-Check
+	public static String newVersion = VERSION;
 	
 	private Thread thread;
 	private JFrame frame;
@@ -89,6 +93,29 @@ public class Project extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
+		
+		Graphics g = bs.getDrawGraphics();
+		
+		// Hintergrund wird schwarz gezeichnet
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		
+		// Nur zu Testzwecken
+		if (isOutdated()) {
+			g.setColor(Color.RED);
+			g.drawString("PAC-Man ist nicht mehr auf dem neusten Stand!", 100, 100);
+			g.drawString("Aktuelle Version (" + newVersion + ") herunterladen: " + Utils.websiteDomain + "/" + Project.GAME_ID_REF + "/", 100, 120);
+		} else {
+			g.setColor(Color.GREEN);
+			g.drawString("PAC-Man ist auf dem neusten Stand.", 100, 100);
+		}
+		
+		g.dispose();
+		bs.show();
+	}
+	
+	public static boolean isOutdated() {
+		return !VERSION.equalsIgnoreCase(newVersion);
 	}
 
 }
