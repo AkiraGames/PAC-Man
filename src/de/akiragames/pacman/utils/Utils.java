@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Random;
 
-import de.akiragames.pacman.Project;
+import de.akiragames.pacman.Main;
 
 public class Utils {
 	
@@ -30,10 +30,10 @@ public class Utils {
 		
 		int length = 5;
 
-		String randomId = Project.GAME_ID_REF + Utils.randomKey(length);
+		String randomId = Main.GAME_ID_REF + Utils.randomKey(length);
 		
 		while (Arrays.asList(gameIds).contains(randomId)) {
-			randomId = Project.GAME_ID_REF + Utils.randomKey(length);
+			randomId = Main.GAME_ID_REF + Utils.randomKey(length);
 		}
 		
 		return randomId;

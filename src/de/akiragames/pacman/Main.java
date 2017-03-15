@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import de.akiragames.pacman.utils.ProjectUtils;
 import de.akiragames.pacman.utils.Utils;
 
-public class Project extends Canvas implements Runnable {
+public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 	
 	// Projekt-Parameter
@@ -29,11 +29,12 @@ public class Project extends Canvas implements Runnable {
 	
 	private Thread thread;
 	private JFrame frame;
+	private Graphics graphics;
 	private boolean running = false;
 	
 	//////////////////////////////////////////////////////////////////////////
 	
-	public Project() {
+	public Main() {
 		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
 		setPreferredSize(size);
 		
@@ -43,7 +44,7 @@ public class Project extends Canvas implements Runnable {
 	public static void main(String[] args) {
 		ProjectUtils.checkUpdates();
 		
-		Project project = new Project();
+		Main project = new Main();
 		
 		project.frame.setResizable(false);
 		project.frame.setTitle(NAME + " " + VERSION);
@@ -94,23 +95,23 @@ public class Project extends Canvas implements Runnable {
 			return;
 		}
 		
-		Graphics g = bs.getDrawGraphics();
+		this.graphics = bs.getDrawGraphics();
 		
 		// Hintergrund wird schwarz gezeichnet
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, getWidth(), getHeight());
+		this.graphics.setColor(Color.BLACK);
+		this.graphics.fillRect(0, 0, getWidth(), getHeight());
 		
 		// Nur zu Testzwecken
 		if (isOutdated()) {
-			g.setColor(Color.RED);
-			g.drawString("PAC-Man ist nicht mehr auf dem neusten Stand!", 100, 100);
-			g.drawString("Aktuelle Version (" + newVersion + ") herunterladen: " + Utils.websiteDomain + "/" + Project.GAME_ID_REF + "/", 100, 120);
+			this.graphics.setColor(Color.RED);
+			this.graphics.drawString("PAC-Man ist nicht mehr auf dem neusten Stand!", 100, 100);
+			this.graphics.drawString("Aktuelle Version (" + newVersion + ") herunterladen: " + Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/", 100, 120);
 		} else {
-			g.setColor(Color.GREEN);
-			g.drawString("PAC-Man ist auf dem neusten Stand.", 100, 100);
+			this.graphics.setColor(Color.GREEN);
+			this.graphics.drawString("PAC-Man ist auf dem neusten Stand.", 100, 100);
 		}
 		
-		g.dispose();
+		this.graphics.dispose();
 		bs.show();
 	}
 	

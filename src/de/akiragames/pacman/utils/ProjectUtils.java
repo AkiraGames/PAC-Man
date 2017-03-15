@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import de.akiragames.pacman.Project;
+import de.akiragames.pacman.Main;
 
 public class ProjectUtils {
 	
@@ -15,7 +15,7 @@ public class ProjectUtils {
 		
 		try {
 			System.out.println("Requesting project data from database...");
-			result = ProjectUtils.sendGetRequest(Utils.websiteDomain + "/project_updates.php?gameRef=" + Project.GAME_ID_REF);
+			result = ProjectUtils.sendGetRequest(Utils.websiteDomain + "/project_updates.php?gameRef=" + Main.GAME_ID_REF);
 			System.out.println("Successfully requested project data from database.");
 		} catch (Exception e) {
 			System.err.println("Failed to request project data from database (" + e.getMessage() + ")!");
@@ -30,11 +30,11 @@ public class ProjectUtils {
 			
 			System.out.println("Checking if application is up to date...");
 			
-			if (!newVersion.equalsIgnoreCase(Project.VERSION)) {
-				Project.newVersion = newVersion;
+			if (!newVersion.equalsIgnoreCase(Main.VERSION)) {
+				Main.newVersion = newVersion;
 				
-				System.err.println("A new version of this application has been released on " + Utils.formatTime(timestamp) + ": " + Project.NAME + " " + newVersion);
-				System.err.println("Download latest version on " + Utils.websiteDomain + "/" + Project.GAME_ID_REF + "/");
+				System.err.println("A new version of this application has been released on " + Utils.formatTime(timestamp) + ": " + Main.NAME + " " + newVersion);
+				System.err.println("Download latest version on " + Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/");
 			} else {
 				System.out.println("Application is up to date.");
 			}
@@ -47,7 +47,7 @@ public class ProjectUtils {
 		
 		try {
 			System.out.println("Requesting game data from database...");
-			result = ProjectUtils.sendGetRequest(Utils.websiteDomain + "/" + Project.GAME_ID_REF + "/game_ids.php");
+			result = ProjectUtils.sendGetRequest(Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/game_ids.php");
 			System.out.println("Successfully requested game data from database.");
 		} catch (Exception e) {
 			System.err.println("Failed to request game data from database (" + e.getMessage() + ")!");
