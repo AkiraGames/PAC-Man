@@ -69,8 +69,8 @@ public class Main extends Canvas implements Runnable {
 	public synchronized void start() {
 		this.running = true;
 
-		thread = new Thread(this, NAME);
-		thread.start();
+		this.thread = new Thread(this, NAME);
+		this.thread.start();
 	}
 
 	// Thread stoppen
@@ -78,17 +78,52 @@ public class Main extends Canvas implements Runnable {
 		this.running = false;
 
 		try {
-			thread.join();
+			this.thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("Thread has been terminated.");
 	}
 
+	// Programm wird ausgeführt
+	// Maximal 60 Updates pro Sekunde, unbegrenzte FPS
 	public void run() {
+		long lastTime = System.nanoTime();
+		long timer = System.currentTimeMillis();
+		final double desiredUPS = 60.0;
+		final double nano = 1000000000.0 / desiredUPS;	
+		double delta = 0;
+		int frames = 0;
+		int updates = 0;
+		
 		while (this.running) {
-			this.update();
+			long now = System.nanoTime();
+			
+			delta += (now - lastTime) / nano;
+			lastTime = now;
+			
+			while (delta >= 1) {
+				update();
+				updates++;
+				delta--;
+			}
+			
 			this.render();
+			frames++;
+			
+			// UPS-/FPS-Counter
+			if (System.currentTimeMillis() - timer > 1000) {
+				timer += 1000;
+				
+				this.frame.setTitle(NAME + " " + VERSION + " [ " + updates + " ups | " + frames + " fps ]");
+				
+				updates = 0;
+				frames = 0;
+			}
 		}
+		
+		this.stop();
 	}
 
 	public void update() {
