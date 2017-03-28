@@ -21,9 +21,8 @@ public class Main extends Canvas implements Runnable {
 	public static final String VERSION = "inDev";
 
 	// Fenster-Parameter
-	public static final int WIDTH = 250;
+	public static final int WIDTH = 750;
 	public static final int HEIGHT = WIDTH / 4 * 3;
-	public static final int SCALE = 3;
 
 	// Nur für Update-Check
 	public static String newVersion = VERSION;
@@ -41,7 +40,7 @@ public class Main extends Canvas implements Runnable {
 	//////////////////////////////////////////////////////////////////////////
 
 	public Main() {
-		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
+		Dimension size = new Dimension(WIDTH, HEIGHT);
 		setPreferredSize(size);
 
 		this.screen = new Screen(WIDTH, HEIGHT);
@@ -139,6 +138,8 @@ public class Main extends Canvas implements Runnable {
 		
 		this.screen.clear();
 		this.screen.render();
+		this.screen.drawRect(10, 10, 300, 200, 0xff0000); // Test
+		this.screen.drawCircle(400, 300, 200, 0x0000ff); // Test
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = screen.getPixels()[i];

@@ -25,9 +25,47 @@ public class Screen {
 			for (int x = 0; x < this.width; x++) {
 				if (x < 0 || x >= this.width) break;
 				
-				this.pixels[x + y * this.width] = 0x00ff00;
+				this.pixels[x + y * this.width] = 0x00ff00; // Test
 			}
 		}
+	}
+	
+	/**
+	 * Draws a rectangle with top-left corner coordinates (xPos / yPos).
+	 */
+	public void drawRect(int xPos, int yPos, int width, int height, int hexColor) {
+		for (int y = yPos; y < yPos + height; y++) {
+			if (y < 0 || y >= this.height) break;
+			
+			for (int x = xPos; x < xPos + width; x++) {
+				if (x < 0 || x >= this.width) break;
+				
+				this.pixels[x + y * this.width] = hexColor;
+			}
+		}
+	}
+	
+	/**
+	 * Draws a circle with center corner coordinates (xCenter / yCenter).
+	 */
+	public void drawCircle(int xCenter, int yCenter, int radius, int hexColor) {
+		for (int y = yCenter - radius; y < yCenter + radius; y++) {
+			if (y < 0 || y >= this.height) break;
+			
+			for (int x = xCenter - radius; x < xCenter + radius; x++) {
+				if (x < 0 || x >= this.width) break;
+				
+				if (this.getPixelDistance(xCenter, yCenter, x, y) <= radius) {
+					this.pixels[x + y * this.width] = hexColor;
+				}
+			}
+		}
+	}
+	
+	/////////////////////////////////////////
+	
+	public double getPixelDistance(int x1, int y1, int x2, int y2) {
+		return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 	}
 
 	public int[] getPixels() {
