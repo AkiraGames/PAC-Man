@@ -1,7 +1,7 @@
 package de.akiragames.pacman.game;
 
 import de.akiragames.pacman.Main;
-import de.akiragames.pacman.creature.Creature;
+import de.akiragames.pacman.entity.LivingEntity;
 import de.akiragames.pacman.utils.ProjectUtils;
 import de.akiragames.pacman.utils.Utils;
 
@@ -11,9 +11,9 @@ public class Game {
 	private int gameScore, gameStart;
 	private int lives, ghostsEaten, powerUpsEaten;
 	
-	private Creature pacman;
+	private LivingEntity pacman;
 	
-	public Game(Creature pacman) {
+	public Game(LivingEntity pacman) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
 		this.gameStart = Utils.unixTime();
@@ -51,7 +51,7 @@ public class Game {
 		return this.gameScore;
 	}
 	
-	public Creature getPacMan() {
+	public LivingEntity getPacMan() {
 		return this.pacman;
 	}
 	

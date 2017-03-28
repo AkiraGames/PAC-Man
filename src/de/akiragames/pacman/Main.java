@@ -1,7 +1,6 @@
 package de.akiragames.pacman;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -139,8 +138,6 @@ public class Main extends Canvas implements Runnable {
 		
 		this.screen.clear();
 		this.screen.render();
-		this.screen.drawRect(10, 10, 300, 200, Color.RED); // Test
-		this.screen.drawCircle(400, 300, 200, Color.YELLOW, true, 10, Color.BLACK); // Test
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = screen.getPixels()[i];
