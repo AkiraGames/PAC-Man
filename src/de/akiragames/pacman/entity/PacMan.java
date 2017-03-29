@@ -3,6 +3,7 @@ package de.akiragames.pacman.entity;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import de.akiragames.pacman.Main;
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.graphics.Screen;
 
@@ -33,7 +34,28 @@ public class PacMan extends LivingEntity {
 		this.imagesDown = new BufferedImage[]{this.images[0], this.images[7], this.images[8], this.images[9]};
 		this.imagesLeft = new BufferedImage[]{this.images[0], this.images[10], this.images[11], this.images[12]};
 		
+		this.setSpeed(2);
 		this.changeDirection(Direction.RIGHT);
+	}
+
+	public void update() {
+		if (Main.getKeyboard().up) {
+			this.changeDirection(Direction.UP);
+			
+			this.posY -= this.getSpeed();
+		} else if (Main.getKeyboard().down) {
+			this.changeDirection(Direction.DOWN);
+			
+			this.posY += this.getSpeed();
+		} else if (Main.getKeyboard().left) {
+			this.changeDirection(Direction.LEFT);
+			
+			this.posX -= this.getSpeed();
+		} else if (Main.getKeyboard().right) {
+			this.changeDirection(Direction.RIGHT);
+			
+			this.posX += this.getSpeed();
+		}
 	}
 
 	public void renderAnimation(Screen screen) {
@@ -41,7 +63,7 @@ public class PacMan extends LivingEntity {
 		
 		this.counter++;
 		
-		if (this.counter % 300 == 0) {
+		if (this.counter % 100 == 0) {
 			if (this.anim == this.imagesUp.length - 1) {
 				this.animUp = false;
 			} else if (this.anim == 0) {
@@ -72,9 +94,9 @@ public class PacMan extends LivingEntity {
 		int xOffset = this.posX - w / 2;
 		int yOffset = this.posY - h / 2;
 		
-		for (int y = yOffset; y < screen.getHeight(); y++) {
+		for (int y = yOffset; y < this.posY + h / 2; y++) {
 			if (y >= 0 && y < screen.getHeight() && y < h + yOffset) {
-				for (int x = xOffset; x < screen.getWidth(); x++) {
+				for (int x = xOffset; x < this.posX + w / 2; x++) {
 					if (x >= 0 && x < screen.getWidth() && x < w + xOffset) {
 						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != screen.getAlphaColor().getRGB())
 							pixels[x + y * screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];

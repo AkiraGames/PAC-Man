@@ -48,9 +48,9 @@ public class Entity {
 		int xOffset = this.posX - w / 2;
 		int yOffset = this.posY - h / 2;
 		
-		for (int y = yOffset; y < screen.getHeight(); y++) {
+		for (int y = yOffset; y < this.posY + h / 2; y++) {
 			if (y >= 0 && y < screen.getHeight() && y < h + yOffset) {
-				for (int x = xOffset; x < screen.getWidth(); x++) {
+				for (int x = xOffset; x < this.posX + w / 2; x++) {
 					if (x >= 0 && x < screen.getWidth() && x < w + xOffset) {
 						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != screen.getAlphaColor().getRGB())
 							pixels[x + y * screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];

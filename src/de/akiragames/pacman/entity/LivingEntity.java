@@ -6,14 +6,14 @@ import de.akiragames.pacman.game.Direction;
 
 public class LivingEntity extends Entity {
 	
-	private double speed;
+	private int speed;
 	private boolean isMoving;
 	private Direction direction;
 	
 	public LivingEntity(int posX, int posY, File[] imageFiles, boolean imagesContainAlphaColor) {
 		super(posX, posY, imageFiles, imagesContainAlphaColor);
 		
-		this.speed = 1.0;
+		this.speed = 1;
 		this.isMoving = false;
 		this.direction = Direction.UP;
 	}
@@ -22,16 +22,35 @@ public class LivingEntity extends Entity {
 	 * Ändert Richtung des LivingEntity.
 	 */
 	public void changeDirection(Direction newDirection) {
-		this.direction = newDirection;
+		if (this.direction != newDirection) this.direction = newDirection;
 	}
 	
 	/**
 	 * Setzt Geschwindigkeitswert für die Kreatur.
 	 */
-	public void setSpeed(double newSpeed) {
-		if (newSpeed < 0.0) newSpeed = 1.0;
+	public void setSpeed(int newSpeed) {
+		if (newSpeed < 0) newSpeed = 1;
 		
 		this.speed = newSpeed;
+	}
+	
+	public void move() {
+		switch(this.direction) {
+			case UP:
+				this.posY -= this.speed;
+				break;
+			case DOWN:
+				this.posY += this.speed;
+				break;
+			case LEFT:
+				this.posX -= this.speed;
+				break;
+			case RIGHT:
+				this.posX += this.speed;
+				break;
+			default:
+				break;
+		}
 	}
 	
 	////////////////////////////////////////////
