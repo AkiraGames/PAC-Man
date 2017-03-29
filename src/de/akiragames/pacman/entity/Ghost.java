@@ -1,18 +1,18 @@
 package de.akiragames.pacman.entity;
 
-import java.awt.Color;
+import java.io.File;
 
 import de.akiragames.pacman.game.Direction;
+import de.akiragames.pacman.game.GameColor;
 
 public class Ghost extends LivingEntity {
 	
-	private Color mainColor, currentColor;
+	private GameColor color;
 
-	public Ghost(int posX, int posY, Color color, Direction direction) {
-		super(posX, posY);
+	public Ghost(int posX, int posY, Direction direction) {
+		super(posX, posY, new File[]{new File("res/ghost_1.jpg"), new File("res/ghost_2.jpg")}, true);
 		
-		this.mainColor = color;
-		this.currentColor = color;
+		this.color = GameColor.NORMAL;
 		
 		this.changeDirection(direction);
 	}
@@ -20,25 +20,21 @@ public class Ghost extends LivingEntity {
 	/**
 	 * Verändert die aktuelle Farbe.
 	 */
-	public void changeColor(Color newColor) {
-		this.currentColor = newColor;
+	public void changeColor(GameColor newColor) {
+		this.color = newColor;
 	}
 	
 	/**
 	 * Setzt aktuelle Farbe auf Ursprungsfarbe zurück.
 	 */
 	public void resetColor() {
-		this.currentColor = this.mainColor;
+		this.color = GameColor.NORMAL;
 	}
 	
 	///////////////////////////////////////////////
 	
-	public Color getMainColor() {
-		return this.mainColor;
-	}
-	
-	public Color getCurrentColor() {
-		return this.currentColor;
+	public GameColor getColor() {
+		return this.color;
 	}
 
 }

@@ -9,6 +9,7 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import de.akiragames.pacman.entity.PacMan;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.utils.ProjectUtils;
 
@@ -21,8 +22,9 @@ public class Main extends Canvas implements Runnable {
 	public static final String VERSION = "inDev";
 
 	// Fenster-Parameter
-	public static final int WIDTH = 750;
+	public static final int WIDTH = 200;
 	public static final int HEIGHT = WIDTH / 4 * 3;
+	public static final int SCALE = 3;
 
 	// Nur für Update-Check
 	public static String newVersion = VERSION;
@@ -33,6 +35,8 @@ public class Main extends Canvas implements Runnable {
 	private boolean running = false;
 	
 	private Screen screen;
+	
+	private PacMan testPacMan = new PacMan(50, 50);
 
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -40,7 +44,7 @@ public class Main extends Canvas implements Runnable {
 	//////////////////////////////////////////////////////////////////////////
 
 	public Main() {
-		Dimension size = new Dimension(WIDTH, HEIGHT);
+		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
 		setPreferredSize(size);
 
 		this.screen = new Screen(WIDTH, HEIGHT);
@@ -138,6 +142,8 @@ public class Main extends Canvas implements Runnable {
 		
 		this.screen.clear();
 		this.screen.render();
+		
+		this.testPacMan.renderAnimation(this.screen);
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = screen.getPixels()[i];

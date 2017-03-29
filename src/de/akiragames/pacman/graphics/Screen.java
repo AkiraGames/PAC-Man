@@ -19,6 +19,14 @@ public class Screen {
 			pixels[i] = 0;
 		}
 	}
+	
+	public void changePixels(int[] pixels) {
+		if (this.pixels.length == pixels.length) {
+			this.pixels = pixels;
+		} else {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+	}
 
 	public void render() {
 		for (int y = 0; y < this.height; y++) {
@@ -34,6 +42,14 @@ public class Screen {
 	
 	/////////////////////////////////////////
 
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
 	public int[] getPixels() {
 		return this.pixels;
 	}
@@ -41,8 +57,8 @@ public class Screen {
 	/**
 	 * Gibt den Farbwert zurück, der ausgeschnitten werden soll (wie .png).
 	 */
-	public static Color getAlphaColor() {
-		return Color.PINK;
+	public Color getAlphaColor() {
+		return new Color(0xff00ff);
 	}
 
 }
