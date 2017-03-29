@@ -28,16 +28,10 @@ public class Screen {
 		}
 	}
 
-	public void render() {
-		for (int y = 0; y < this.height; y++) {
-			if (y < 0 || y >= this.height) break;
-			
-			for (int x = 0; x < this.width; x++) {
-				if (x < 0 || x >= this.width) break;
-				
-				this.pixels[x + y * this.width] = 0x00ff00; // Test
-			}
-		}
+	/**
+	 * Rendert das Labyrinth.
+	 */
+	public void renderLevel() {
 	}
 	
 	/////////////////////////////////////////

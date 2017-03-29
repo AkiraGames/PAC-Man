@@ -36,7 +36,7 @@ public class Main extends Canvas implements Runnable {
 	
 	private Screen screen;
 	
-	private PacMan testPacMan = new PacMan(50, 50);
+	private PacMan testPacMan = new PacMan(20, 20);
 
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -141,7 +141,6 @@ public class Main extends Canvas implements Runnable {
 		}
 		
 		this.screen.clear();
-		this.screen.render();
 		
 		this.testPacMan.renderAnimation(this.screen);
 		

@@ -10,18 +10,11 @@ import de.akiragames.pacman.graphics.Screen;
 
 public class Entity {
 	
-	private int counter, time;
-	private boolean animUp;
-	
 	protected int posX, posY;
-	private BufferedImage[] images;
+	protected BufferedImage[] images;
 	private boolean imagesContainAlphaColor;
 	
 	public Entity(int posX, int posY, File[] imageFiles, boolean imagesContainAlphaColor) {
-		this.counter = 0;
-		this.time = 0;
-		this.animUp = true;
-		
 		this.posX = posX;
 		this.posY = posY;
 		
@@ -52,53 +45,17 @@ public class Entity {
 		
 		this.images[imageIndex].getRGB(0, 0, w, h, imagePixels, 0, w);
 		
-		for (int y = 0; y < screen.getHeight(); y++) {
-			if (y < 0 || y >= screen.getHeight() || y >= h) break;
-			
-			for (int x = 0; x < screen.getWidth(); x++) {
-				if (x < 0 || x >= screen.getWidth() || x >= w) break;
-				
-				if (imagePixels[x + y * w] != screen.getAlphaColor().getRGB())
-					pixels[x + y * screen.getWidth()] = imagePixels[x + y * w];
-			}
-		}
+		int xOffset = this.posX - w / 2;
+		int yOffset = this.posY - h / 2;
 		
-		screen.changePixels(pixels);
-	}
-	
-	public void renderAnimation(Screen screen) {
-		int[] pixels = screen.getPixels();
-		
-		this.counter++;
-		
-		if (this.counter % 250 == 0) {
-			if (this.time == this.images.length - 1) {
-				this.animUp = false;
-			} else if (this.time == 0) {
-				this.animUp = true;
-			}
-			
-			if (this.animUp) {
-				time++;
-			} else {
-				time--;
-			}
-		}
-		
-		int w = this.images[this.time].getWidth();
-		int h = this.images[this.time].getHeight();
-		int[] imagePixels = new int[w * h];
-		
-		this.images[this.time].getRGB(0, 0, w, h, imagePixels, 0, w);
-		
-		for (int y = 0; y < screen.getHeight(); y++) {
-			if (y < 0 || y >= screen.getHeight() || y >= h) break;
-			
-			for (int x = 0; x < screen.getWidth(); x++) {
-				if (x < 0 || x >= screen.getWidth() || x >= w) break;
-				
-				if (imagePixels[x + y * w] != screen.getAlphaColor().getRGB())
-					pixels[x + y * screen.getWidth()] = imagePixels[x + y * w];
+		for (int y = yOffset; y < screen.getHeight(); y++) {
+			if (y >= 0 && y < screen.getHeight() && y < h + yOffset) {
+				for (int x = xOffset; x < screen.getWidth(); x++) {
+					if (x >= 0 && x < screen.getWidth() && x < w + xOffset) {
+						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != screen.getAlphaColor().getRGB())
+							pixels[x + y * screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+					}
+				}
 			}
 		}
 		
