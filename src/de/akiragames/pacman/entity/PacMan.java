@@ -34,7 +34,6 @@ public class PacMan extends LivingEntity {
 		this.imagesDown = new BufferedImage[]{this.images[0], this.images[7], this.images[8], this.images[9]};
 		this.imagesLeft = new BufferedImage[]{this.images[0], this.images[10], this.images[11], this.images[12]};
 		
-		this.setSpeed(2);
 		this.changeDirection(Direction.RIGHT);
 	}
 

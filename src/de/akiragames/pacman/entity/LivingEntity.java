@@ -13,7 +13,7 @@ public class LivingEntity extends Entity {
 	public LivingEntity(int posX, int posY, File[] imageFiles, boolean imagesContainAlphaColor) {
 		super(posX, posY, imageFiles, imagesContainAlphaColor);
 		
-		this.speed = 1;
+		this.speed = 2;
 		this.isMoving = false;
 		this.direction = Direction.UP;
 	}
@@ -29,7 +29,7 @@ public class LivingEntity extends Entity {
 	 * Setzt Geschwindigkeitswert für die Kreatur.
 	 */
 	public void setSpeed(int newSpeed) {
-		if (newSpeed < 0) newSpeed = 1;
+		if (newSpeed < 0) newSpeed = 2;
 		
 		this.speed = newSpeed;
 	}

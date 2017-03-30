@@ -9,7 +9,9 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import de.akiragames.pacman.entity.Ghost;
 import de.akiragames.pacman.entity.PacMan;
+import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
 import de.akiragames.pacman.utils.ProjectUtils;
@@ -40,6 +42,10 @@ public class Main extends Canvas implements Runnable {
 	private Screen screen;
 	
 	private PacMan testPacMan = new PacMan(50, 50);
+	private Ghost testGhost1 = new Ghost(200, 400, Direction.UP);
+	private Ghost testGhost2 = new Ghost(400, 50, Direction.DOWN);
+	private Ghost testGhost3 = new Ghost(500, 200, Direction.LEFT);
+	private Ghost testGhost4 = new Ghost(50, 300, Direction.RIGHT);
 
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -138,6 +144,10 @@ public class Main extends Canvas implements Runnable {
 	public void update() {
 		keyboard.update();
 		this.testPacMan.update();
+		this.testGhost1.move();
+		this.testGhost2.move();
+		this.testGhost3.move();
+		this.testGhost4.move();
 	}
 
 	public void render() {
@@ -150,6 +160,10 @@ public class Main extends Canvas implements Runnable {
 		
 		this.screen.clear();
 		
+		this.testGhost1.render(this.screen, 0);
+		this.testGhost2.render(this.screen, 1);
+		this.testGhost3.render(this.screen, 2);
+		this.testGhost4.render(this.screen, 3);
 		this.testPacMan.renderAnimation(this.screen);
 		
 		for (int i = 0; i < this.pixels.length; i++) {

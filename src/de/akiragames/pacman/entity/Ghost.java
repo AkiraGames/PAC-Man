@@ -10,7 +10,7 @@ public class Ghost extends LivingEntity {
 	private GameColor color;
 
 	public Ghost(int posX, int posY, Direction direction) {
-		super(posX, posY, new File[]{new File("res/ghost/ghost_1.jpg"), new File("res/ghost/ghost_2.jpg")}, true);
+		super(posX, posY, new File[]{new File("res/ghost/ghost_1.png"), new File("res/ghost/ghost_2.png"), new File("res/ghost/ghost_3.png"), new File("res/ghost/ghost_4.png")}, true);
 		
 		this.color = GameColor.NORMAL;
 		
