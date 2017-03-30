@@ -11,12 +11,14 @@ import de.akiragames.pacman.graphics.Screen;
 public class Entity {
 	
 	protected int posX, posY;
+	protected Screen screen;
 	protected BufferedImage[] images;
 	private boolean imagesContainAlphaColor;
 	
-	public Entity(int posX, int posY, File[] imageFiles, boolean imagesContainAlphaColor) {
+	public Entity(int posX, int posY, Screen screen, File[] imageFiles, boolean imagesContainAlphaColor) {
 		this.posX = posX;
 		this.posY = posY;
+		this.screen = screen;
 		
 		this.images = this.loadImages(imageFiles);
 		this.imagesContainAlphaColor = imagesContainAlphaColor;
@@ -36,8 +38,8 @@ public class Entity {
 		return images;
 	}
 	
-	public void render(Screen screen, int imageIndex) {
-		int[] pixels = screen.getPixels();
+	public void render(int imageIndex) {
+		int[] pixels = this.screen.getPixels();
 		
 		int w = this.images[imageIndex].getWidth();
 		int h = this.images[imageIndex].getHeight();
@@ -49,17 +51,17 @@ public class Entity {
 		int yOffset = this.posY - h / 2;
 		
 		for (int y = yOffset; y < this.posY + h / 2; y++) {
-			if (y >= 0 && y < screen.getHeight() && y < h + yOffset) {
+			if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
 				for (int x = xOffset; x < this.posX + w / 2; x++) {
-					if (x >= 0 && x < screen.getWidth() && x < w + xOffset) {
-						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != screen.getAlphaColor().getRGB())
-							pixels[x + y * screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+					if (x >= 0 && x < this.screen.getWidth() && x < w + xOffset) {
+						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.screen.getAlphaColor().getRGB())
+							pixels[x + y * this.screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
 					}
 				}
 			}
 		}
 		
-		screen.changePixels(pixels);
+		this.screen.changePixels(pixels);
 	}
 	
 	/////////////////////////////////////////////////
@@ -70,6 +72,10 @@ public class Entity {
 	
 	public int getPosY() {
 		return this.posY;
+	}
+	
+	public Screen getScreen() {
+		return this.screen;
 	}
 	
 	public BufferedImage[] getImages() {

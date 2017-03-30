@@ -17,8 +17,8 @@ public class PacMan extends LivingEntity {
 	private BufferedImage[] imagesDown;
 	private BufferedImage[] imagesLeft;
 
-	public PacMan(int posX, int posY) {
-		super(posX, posY, new File[]{
+	public PacMan(int posX, int posY, Screen screen) {
+		super(posX, posY, screen, new File[]{
 				new File("res/pacman/pacman_1.png"), new File("res/pacman/pacman_2.png"), new File("res/pacman/pacman_3.png"), 
 				new File("res/pacman/pacman_4.png"), new File("res/pacman/pacman_5.png"), new File("res/pacman/pacman_6.png"), 
 				new File("res/pacman/pacman_7.png"), new File("res/pacman/pacman_8.png"), new File("res/pacman/pacman_9.png"), 
@@ -38,31 +38,34 @@ public class PacMan extends LivingEntity {
 	}
 
 	public void update() {
+		int xOffset = this.images[0].getWidth() / 2;
+		int yOffset = this.images[0].getHeight() / 2;
+		
 		if (Main.getKeyboard().up) {
+			if (posY > yOffset) this.posY -= this.getSpeed();
+			
 			this.changeDirection(Direction.UP);
-			
-			this.posY -= this.getSpeed();
 		} else if (Main.getKeyboard().down) {
+			if (posY < this.screen.getHeight() - yOffset) this.posY += this.getSpeed();
+			
 			this.changeDirection(Direction.DOWN);
-			
-			this.posY += this.getSpeed();
 		} else if (Main.getKeyboard().left) {
+			if (posX > xOffset) this.posX -= this.getSpeed();
+
 			this.changeDirection(Direction.LEFT);
-			
-			this.posX -= this.getSpeed();
 		} else if (Main.getKeyboard().right) {
+			if (posX < this.screen.getWidth() - xOffset) this.posX += this.getSpeed();
+
 			this.changeDirection(Direction.RIGHT);
-			
-			this.posX += this.getSpeed();
 		}
 	}
 
-	public void renderAnimation(Screen screen) {
-		int[] pixels = screen.getPixels();
+	public void renderAnimation() {
+		int[] pixels = this.screen.getPixels();
 		
 		this.counter++;
 		
-		if (this.counter % 100 == 0) {
+		if (this.counter % 75 == 0) {
 			if (this.anim == this.imagesUp.length - 1) {
 				this.animUp = false;
 			} else if (this.anim == 0) {
@@ -70,9 +73,9 @@ public class PacMan extends LivingEntity {
 			}
 			
 			if (this.animUp) {
-				anim++;
+				this.anim++;
 			} else {
-				anim--;
+				this.anim--;
 			}
 		}
 		
@@ -94,17 +97,17 @@ public class PacMan extends LivingEntity {
 		int yOffset = this.posY - h / 2;
 		
 		for (int y = yOffset; y < this.posY + h / 2; y++) {
-			if (y >= 0 && y < screen.getHeight() && y < h + yOffset) {
+			if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
 				for (int x = xOffset; x < this.posX + w / 2; x++) {
-					if (x >= 0 && x < screen.getWidth() && x < w + xOffset) {
-						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != screen.getAlphaColor().getRGB())
-							pixels[x + y * screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+					if (x >= 0 && x < this.screen.getWidth() && x < w + xOffset) {
+						if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.screen.getAlphaColor().getRGB())
+							pixels[x + y * this.screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
 					}
 				}
 			}
 		}
 		
-		screen.changePixels(pixels);
+		this.screen.changePixels(pixels);
 	}
 
 }

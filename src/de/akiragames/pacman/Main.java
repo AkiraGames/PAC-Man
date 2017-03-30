@@ -10,7 +10,9 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import de.akiragames.pacman.entity.Ghost;
+import de.akiragames.pacman.entity.PacDot;
 import de.akiragames.pacman.entity.PacMan;
+import de.akiragames.pacman.entity.PowerUp;
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
@@ -41,11 +43,17 @@ public class Main extends Canvas implements Runnable {
 	
 	private Screen screen;
 	
-	private PacMan testPacMan = new PacMan(50, 50);
-	private Ghost testGhost1 = new Ghost(200, 400, Direction.UP);
-	private Ghost testGhost2 = new Ghost(400, 50, Direction.DOWN);
-	private Ghost testGhost3 = new Ghost(500, 200, Direction.LEFT);
-	private Ghost testGhost4 = new Ghost(50, 300, Direction.RIGHT);
+	private PacMan testPacMan;
+	private Ghost testGhost1;
+	private Ghost testGhost2;
+	private Ghost testGhost3;
+	private Ghost testGhost4;
+	private Ghost testGhost5;
+	private PowerUp testPowerUp1;
+	private PowerUp testPowerUp2;
+	private PowerUp testPowerUp3;
+	private PowerUp testPowerUp4;
+	private PacDot[] testPacDots = new PacDot[5];
 
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -59,6 +67,21 @@ public class Main extends Canvas implements Runnable {
 		this.screen = new Screen(WIDTH, HEIGHT);
 		this.frame = new JFrame();
 		keyboard = new Keyboard();
+		
+		this.testPacMan = new PacMan(50, 50, this.screen);
+		this.testGhost1 = new Ghost(200, 400, this.screen, Direction.UP);
+		this.testGhost2 = new Ghost(400, 50, this.screen, Direction.DOWN);
+		this.testGhost3 = new Ghost(500, 200, this.screen, Direction.LEFT);
+		this.testGhost4 = new Ghost(50, 300, this.screen, Direction.RIGHT);
+		this.testGhost5 = new Ghost(200, 150, this.screen, Direction.RIGHT);
+		this.testPowerUp1 = new PowerUp(200, 150, this.screen);
+		this.testPowerUp2 = new PowerUp(400, 150, this.screen);
+		this.testPowerUp3 = new PowerUp(200, 250, this.screen);
+		this.testPowerUp4 = new PowerUp(400, 250, this.screen);
+	
+		for (int i = 0; i < this.testPacDots.length; i++) {
+			this.testPacDots[i] = new PacDot(250 + i * 25, 200, this.screen);
+		}
 		
 		addKeyListener(keyboard);
 	}
@@ -143,11 +166,13 @@ public class Main extends Canvas implements Runnable {
 
 	public void update() {
 		keyboard.update();
+		
 		this.testPacMan.update();
 		this.testGhost1.move();
 		this.testGhost2.move();
 		this.testGhost3.move();
 		this.testGhost4.move();
+		this.testGhost5.move();
 	}
 
 	public void render() {
@@ -160,11 +185,20 @@ public class Main extends Canvas implements Runnable {
 		
 		this.screen.clear();
 		
-		this.testGhost1.render(this.screen, 0);
-		this.testGhost2.render(this.screen, 1);
-		this.testGhost3.render(this.screen, 2);
-		this.testGhost4.render(this.screen, 3);
-		this.testPacMan.renderAnimation(this.screen);
+		for (int i = 0; i < this.testPacDots.length; i++) {
+			this.testPacDots[i].render();
+		}
+		
+		this.testPowerUp1.render();
+		this.testPowerUp2.render();
+		this.testPowerUp3.render();
+		this.testPowerUp4.render();
+		this.testGhost1.render(0);
+		this.testGhost2.render(1);
+		this.testGhost3.render(2);
+		this.testGhost4.render(3);
+		this.testGhost5.render(4);
+		this.testPacMan.renderAnimation();
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = screen.getPixels()[i];

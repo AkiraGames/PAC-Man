@@ -3,6 +3,7 @@ package de.akiragames.pacman.entity;
 import java.io.File;
 
 import de.akiragames.pacman.game.Direction;
+import de.akiragames.pacman.graphics.Screen;
 
 public class LivingEntity extends Entity {
 	
@@ -10,8 +11,8 @@ public class LivingEntity extends Entity {
 	private boolean isMoving;
 	private Direction direction;
 	
-	public LivingEntity(int posX, int posY, File[] imageFiles, boolean imagesContainAlphaColor) {
-		super(posX, posY, imageFiles, imagesContainAlphaColor);
+	public LivingEntity(int posX, int posY, Screen screen, File[] imageFiles, boolean imagesContainAlphaColor) {
+		super(posX, posY, screen, imageFiles, imagesContainAlphaColor);
 		
 		this.speed = 2;
 		this.isMoving = false;
@@ -35,6 +36,25 @@ public class LivingEntity extends Entity {
 	}
 	
 	public void move() {
+		int xOffset = this.images[0].getWidth() / 2;
+		int yOffset = this.images[0].getHeight() / 2;
+		
+		if (posY <= yOffset) {
+			this.direction = Direction.DOWN;
+			this.posY = yOffset;
+		} else if (posY >= this.screen.getHeight() - yOffset) {
+			this.direction = Direction.UP;
+			this.posY = this.screen.getHeight() - yOffset;
+		}
+		
+		if (posX <= xOffset) {
+			this.direction = Direction.RIGHT;
+			this.posX = xOffset;
+		} else if (posX >= this.screen.getWidth() - xOffset) {
+			this.direction = Direction.LEFT;
+			this.posX = this.screen.getWidth() - xOffset;
+		}
+		
 		switch(this.direction) {
 			case UP:
 				this.posY -= this.speed;
