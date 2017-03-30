@@ -1,11 +1,11 @@
 package de.akiragames.pacman.entity;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import de.akiragames.pacman.Main;
 import de.akiragames.pacman.graphics.Screen;
 
 public class Entity {
@@ -15,7 +15,7 @@ public class Entity {
 	protected BufferedImage[] images;
 	private boolean imagesContainAlphaColor;
 	
-	public Entity(int posX, int posY, Screen screen, File[] imageFiles, boolean imagesContainAlphaColor) {
+	public Entity(int posX, int posY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
 		this.posX = posX;
 		this.posY = posY;
 		this.screen = screen;
@@ -24,12 +24,12 @@ public class Entity {
 		this.imagesContainAlphaColor = imagesContainAlphaColor;
 	}
 	
-	private BufferedImage[] loadImages(File[] imageFiles) {
+	private BufferedImage[] loadImages(String[] imageFiles) {
 		BufferedImage[] images = new BufferedImage[imageFiles.length];
 		
 		try {
 			for (int i = 0; i < imageFiles.length; i++) {
-				images[i] = ImageIO.read(imageFiles[i]);
+				images[i] = ImageIO.read(Main.class.getResource("/" + imageFiles[i]));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

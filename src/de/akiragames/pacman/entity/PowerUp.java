@@ -1,7 +1,5 @@
 package de.akiragames.pacman.entity;
 
-import java.io.File;
-
 import de.akiragames.pacman.graphics.Screen;
 
 public class PowerUp extends Entity {
@@ -9,7 +7,7 @@ public class PowerUp extends Entity {
 	private int counter, anim;
 
 	public PowerUp(int posX, int posY, Screen screen) {
-		super(posX, posY, screen, new File[]{new File("res/map/powerup.png")}, true);
+		super(posX, posY, screen, new String[]{"res/map/powerup.png"}, true);
 	}
 	
 	public void render() {

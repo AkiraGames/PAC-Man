@@ -1,7 +1,6 @@
 package de.akiragames.pacman.entity;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import de.akiragames.pacman.Main;
 import de.akiragames.pacman.game.Direction;
@@ -18,12 +17,12 @@ public class PacMan extends LivingEntity {
 	private BufferedImage[] imagesLeft;
 
 	public PacMan(int posX, int posY, Screen screen) {
-		super(posX, posY, screen, new File[]{
-				new File("res/pacman/pacman_1.png"), new File("res/pacman/pacman_2.png"), new File("res/pacman/pacman_3.png"), 
-				new File("res/pacman/pacman_4.png"), new File("res/pacman/pacman_5.png"), new File("res/pacman/pacman_6.png"), 
-				new File("res/pacman/pacman_7.png"), new File("res/pacman/pacman_8.png"), new File("res/pacman/pacman_9.png"), 
-				new File("res/pacman/pacman_10.png"), new File("res/pacman/pacman_11.png"), new File("res/pacman/pacman_12.png"), 
-				new File("res/pacman/pacman_13.png")}, true);
+		super(posX, posY, screen, new String[]{
+				"res/pacman/pacman_1.png", "res/pacman/pacman_2.png", "res/pacman/pacman_3.png", 
+				"res/pacman/pacman_4.png", "res/pacman/pacman_5.png", "res/pacman/pacman_6.png", 
+				"res/pacman/pacman_7.png", "res/pacman/pacman_8.png", "res/pacman/pacman_9.png", 
+				"res/pacman/pacman_10.png", "res/pacman/pacman_11.png", "res/pacman/pacman_12.png", 
+				"res/pacman/pacman_13.png"}, true);
 		
 		this.counter = 0;
 		this.anim = 0;

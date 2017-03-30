@@ -1,7 +1,5 @@
 package de.akiragames.pacman.entity;
 
-import java.io.File;
-
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.graphics.Screen;
 
@@ -11,7 +9,7 @@ public class LivingEntity extends Entity {
 	private boolean isMoving;
 	private Direction direction;
 	
-	public LivingEntity(int posX, int posY, Screen screen, File[] imageFiles, boolean imagesContainAlphaColor) {
+	public LivingEntity(int posX, int posY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
 		super(posX, posY, screen, imageFiles, imagesContainAlphaColor);
 		
 		this.speed = 2;
