@@ -6,7 +6,7 @@ import de.akiragames.pacman.graphics.Screen;
 public class LivingEntity extends Entity {
 	
 	private int speed;
-	private boolean isMoving;
+	protected boolean isMoving;
 	private Direction direction;
 	
 	public LivingEntity(int posX, int posY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
