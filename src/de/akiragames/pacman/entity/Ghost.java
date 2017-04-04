@@ -6,12 +6,14 @@ import de.akiragames.pacman.graphics.Screen;
 
 public class Ghost extends LivingEntity {
 	
+	private int id;
 	private GameColor color;
 
-	public Ghost(int posX, int posY, Screen screen, Direction direction) {
+	public Ghost(int posX, int posY, Screen screen, Direction direction, int id) {
 		super(posX, posY, screen, new String[]{"res/ghost/ghost_1.png", "res/ghost/ghost_2.png", "res/ghost/ghost_3.png", "res/ghost/ghost_4.png", "res/ghost/ghost_5.png"}, true);
 		
 		this.color = GameColor.NORMAL;
+		this.id = id;
 		
 		this.changeDirection(direction);
 	}
@@ -34,6 +36,10 @@ public class Ghost extends LivingEntity {
 	
 	public GameColor getColor() {
 		return this.color;
+	}
+	
+	public int getId() {
+		return this.id;
 	}
 
 }

@@ -126,33 +126,53 @@ public class PacMan extends LivingEntity {
 		int yOffset = this.images[0].getHeight() / 2;
 		
 		if (Main.getKeyboard().up) {
-			if (this.posY > yOffset) {
-				this.posY -= this.getSpeed();
-				this.isMoving = true;
+			if (this.getDirection() != Direction.UP) {
+				this.changeDirection(Direction.UP);
+				return;
 			}
 			
-			this.changeDirection(Direction.UP);
+			if (this.posY > yOffset && !Main.wallCollisionChecker.getDirections()[0][0]) {
+				this.posY -= this.getSpeed();
+				this.isMoving = true;
+			} else {
+				this.isMoving = false;
+			}
 		} else if (Main.getKeyboard().down) {
-			if (this.posY < this.screen.getHeight() - yOffset) {
+			if (this.getDirection() != Direction.DOWN) {
+				this.changeDirection(Direction.DOWN);
+				return;
+			} else {
+				this.isMoving = false;
+			}
+			
+			if (this.posY < this.screen.getHeight() - yOffset && !Main.wallCollisionChecker.getDirections()[0][1]) {
 				this.posY += this.getSpeed();
 				this.isMoving = true;
 			}
-			
-			this.changeDirection(Direction.DOWN);
 		} else if (Main.getKeyboard().left) {
-			if (this.posX > xOffset) {
+			if (this.getDirection() != Direction.LEFT) { 
+				this.changeDirection(Direction.LEFT);
+				return; 
+			}
+			
+			if (this.posX > xOffset && !Main.wallCollisionChecker.getDirections()[0][2]) {
 				this.posX -= this.getSpeed();
 				this.isMoving = true;
+			} else {
+				this.isMoving = false;
 			}
-
-			this.changeDirection(Direction.LEFT);
 		} else if (Main.getKeyboard().right) {
-			if (this.posX < this.screen.getWidth() - xOffset) {
+			if (this.getDirection() != Direction.RIGHT) {
+				this.changeDirection(Direction.RIGHT);
+				return;
+			}
+			
+			if (this.posX < this.screen.getWidth() - xOffset && !Main.wallCollisionChecker.getDirections()[0][3]) {
 				this.posX += this.getSpeed();
 				this.isMoving = true;
+			} else {
+				this.isMoving = false;
 			}
-
-			this.changeDirection(Direction.RIGHT);
 		} else {
 			this.isMoving = false;
 		}

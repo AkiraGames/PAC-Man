@@ -77,7 +77,7 @@ public class LivingEntity extends Entity {
 		return this.direction;
 	}
 	
-	public double getSpeed() {
+	public int getSpeed() {
 		return this.speed;
 	}
 	
