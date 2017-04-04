@@ -55,6 +55,13 @@ public class WallCollisionChecker {
 		}
 	}
 	
+	public void clear(int entityId) {
+		this.directions[entityId][0] = false;
+		this.directions[entityId][1] = false;
+		this.directions[entityId][2] = false;
+		this.directions[entityId][3] = false;
+	}
+	
 	/////////////////////////////////////////////////
 	
 	public boolean[][] getDirections() {

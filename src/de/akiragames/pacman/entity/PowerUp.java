@@ -13,10 +13,6 @@ public class PowerUp extends Entity {
 	public void render() {
 		int[] pixels = this.screen.getPixels();
 		
-		this.counter++;
-		
-		if (this.counter % 75 == 0) this.anim++;
-		
 		int w = this.images[0].getWidth();
 		int h = this.images[0].getHeight();
 		int[] imagePixels = new int[w * h];
@@ -26,7 +22,7 @@ public class PowerUp extends Entity {
 		int xOffset = this.posX - w / 2;
 		int yOffset = this.posY - h / 2;
 		
-		if (this.anim % 5 < 3) {
+		if (this.anim % 4 < 2) {
 			for (int y = yOffset; y < this.posY + h / 2; y++) {
 				if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
 					for (int x = xOffset; x < this.posX + w / 2; x++) {
@@ -40,6 +36,12 @@ public class PowerUp extends Entity {
 			
 			this.screen.changePixels(pixels);
 		}
+	}
+	
+	public void update() {
+		this.counter++;
+		
+		if (this.counter % 6 == 0) this.anim++;
 	}
 
 }

@@ -3,10 +3,18 @@ package de.akiragames.pacman.input;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import de.akiragames.pacman.Main;
+
 public class Keyboard implements KeyListener {
 	
 	private boolean[] keys = new boolean[65536];
 	public boolean up, down, left, right;
+	
+	private Main main;
+	
+	public Keyboard(Main main) {
+		this.main = main;
+	}
 	
 	public void update() {
 		up = keys[KeyEvent.VK_UP] || keys[KeyEvent.VK_W];
@@ -21,10 +29,13 @@ public class Keyboard implements KeyListener {
 
 	public void keyReleased(KeyEvent e) {
 		keys[e.getExtendedKeyCode()] = false;
+		
+		if (e.getExtendedKeyCode() == KeyEvent.VK_F1) {
+			this.main.getScreen().saveScreenshot();
+		}
 	}
 
 	public void keyTyped(KeyEvent e) {
-		
 	}
 
 }

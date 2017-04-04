@@ -39,7 +39,6 @@ public class PacMan extends LivingEntity {
 	public void update() {
 		this.updateCounter(4);
 		this.updateMovement();
-		
 	}
 
 	public void renderAnimation() {
@@ -141,13 +140,13 @@ public class PacMan extends LivingEntity {
 			if (this.getDirection() != Direction.DOWN) {
 				this.changeDirection(Direction.DOWN);
 				return;
-			} else {
-				this.isMoving = false;
 			}
 			
 			if (this.posY < this.screen.getHeight() - yOffset && !Main.wallCollisionChecker.getDirections()[0][1]) {
 				this.posY += this.getSpeed();
 				this.isMoving = true;
+			} else {
+				this.isMoving = false;
 			}
 		} else if (Main.getKeyboard().left) {
 			if (this.getDirection() != Direction.LEFT) { 

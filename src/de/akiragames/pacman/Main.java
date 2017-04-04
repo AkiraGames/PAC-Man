@@ -1,6 +1,7 @@
 package de.akiragames.pacman;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -20,6 +21,7 @@ import de.akiragames.pacman.game.WallCollisionChecker;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
 import de.akiragames.pacman.utils.ProjectUtils;
+import de.akiragames.pacman.utils.Utils;
 
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -61,8 +63,8 @@ public class Main extends Canvas implements Runnable {
 	private PowerUp testPowerUp4;
 	private PacDot[] testPacDots = new PacDot[5];
 
-	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+	public static BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	private int[] pixels = ((DataBufferInt) Main.image.getRaster().getDataBuffer()).getData();
 	
 	//////////////////////////////////////////////////////////////////////////
 
@@ -72,24 +74,25 @@ public class Main extends Canvas implements Runnable {
 
 		this.screen = new Screen(WIDTH, HEIGHT);
 		this.frame = new JFrame();
-		keyboard = new Keyboard();
 		
-		this.testWalls = new Wall[]{new Wall(60, 120, 350, 152, this.screen), new Wall(60, 220, 350, 252, this.screen)};
+		Main.keyboard = new Keyboard(this);
+		
+		this.testWalls = new Wall[]{new Wall(0, 120, 350, 152, this.screen), new Wall(0, 350, 350, 382, this.screen), new Wall(60, 152, 92, 318, this.screen)};
 		this.testPacMan = new PacMan(100, 100, this.screen);
 		this.testGhost1 = new Ghost(200, 400, this.screen, Direction.UP, 1);
 		this.testGhost2 = new Ghost(400, 50, this.screen, Direction.DOWN, 2);
 		this.testGhost3 = new Ghost(500, 200, this.screen, Direction.LEFT, 3);
-		this.testGhost4 = new Ghost(50, 300, this.screen, Direction.RIGHT, 4);
-		this.testGhost5 = new Ghost(200, 150, this.screen, Direction.RIGHT, 5);
-		this.testPowerUp1 = new PowerUp(200, 150, this.screen);
-		this.testPowerUp2 = new PowerUp(400, 150, this.screen);
-		this.testPowerUp3 = new PowerUp(200, 250, this.screen);
-		this.testPowerUp4 = new PowerUp(400, 250, this.screen);
+		this.testGhost4 = new Ghost(16, 200, this.screen, Direction.RIGHT, 4);
+		this.testGhost5 = new Ghost(200, 250, this.screen, Direction.RIGHT, 5);
+		this.testPowerUp1 = new PowerUp(200, 200, this.screen);
+		this.testPowerUp2 = new PowerUp(400, 200, this.screen);
+		this.testPowerUp3 = new PowerUp(200, 300, this.screen);
+		this.testPowerUp4 = new PowerUp(400, 300, this.screen);
 		
 		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.testPacMan, this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5}, this.testWalls);
 	
 		for (int i = 0; i < this.testPacDots.length; i++) {
-			this.testPacDots[i] = new PacDot(250 + i * 25, 200, this.screen);
+			this.testPacDots[i] = new PacDot(250 + i * 25, 250, this.screen);
 		}
 		
 		addKeyListener(Main.keyboard);
@@ -107,7 +110,6 @@ public class Main extends Canvas implements Runnable {
 		project.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		project.frame.setLocationRelativeTo(null);
 		project.frame.setVisible(true);
-		project.frame.requestFocusInWindow();
 
 		project.start();
 	}
@@ -178,11 +180,15 @@ public class Main extends Canvas implements Runnable {
 		Main.wallCollisionChecker.check();
 		
 		this.testPacMan.update();
-		this.testGhost1.move();
-		this.testGhost2.move();
-		this.testGhost3.move();
-		this.testGhost4.move();
-		this.testGhost5.move();
+		this.testPowerUp1.update();
+		this.testPowerUp2.update();
+		this.testPowerUp3.update();
+		this.testPowerUp4.update();
+		this.testGhost1.update();
+		this.testGhost2.update();
+		this.testGhost3.update();
+		this.testGhost4.update();
+		this.testGhost5.update();
 	}
 
 	public void render() {
@@ -214,13 +220,15 @@ public class Main extends Canvas implements Runnable {
 		this.testGhost5.render(4);
 		this.testPacMan.renderAnimation();
 		
+		this.screen.renderText("Unix Time: " + Utils.unixTime(), 20, 20, 30, Color.WHITE);
+		
 		for (int i = 0; i < this.pixels.length; i++) {
-			this.pixels[i] = screen.getPixels()[i];
+			this.pixels[i] = this.screen.getPixels()[i];
 		}
 
 		// BufferedImage wird auf Screen gezeichnet
 		Graphics g = bs.getDrawGraphics();
-		g.drawImage(this.image, 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(Main.image, 0, 0, getWidth(), getHeight(), null);
 		
 		g.dispose();
 		bs.show();
@@ -232,6 +240,10 @@ public class Main extends Canvas implements Runnable {
 	
 	public static Keyboard getKeyboard() {
 		return keyboard;
+	}
+	
+	public Screen getScreen() {
+		return this.screen;
 	}
 
 }

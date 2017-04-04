@@ -33,44 +33,6 @@ public class LivingEntity extends Entity {
 		this.speed = newSpeed;
 	}
 	
-	public void move() {
-		int xOffset = this.images[0].getWidth() / 2;
-		int yOffset = this.images[0].getHeight() / 2;
-		
-		if (posY <= yOffset) {
-			this.direction = Direction.DOWN;
-			this.posY = yOffset;
-		} else if (posY >= this.screen.getHeight() - yOffset) {
-			this.direction = Direction.UP;
-			this.posY = this.screen.getHeight() - yOffset;
-		}
-		
-		if (posX <= xOffset) {
-			this.direction = Direction.RIGHT;
-			this.posX = xOffset;
-		} else if (posX >= this.screen.getWidth() - xOffset) {
-			this.direction = Direction.LEFT;
-			this.posX = this.screen.getWidth() - xOffset;
-		}
-		
-		switch(this.direction) {
-			case UP:
-				this.posY -= this.speed;
-				break;
-			case DOWN:
-				this.posY += this.speed;
-				break;
-			case LEFT:
-				this.posX -= this.speed;
-				break;
-			case RIGHT:
-				this.posX += this.speed;
-				break;
-			default:
-				break;
-		}
-	}
-	
 	////////////////////////////////////////////
 	
 	public Direction getDirection() {
