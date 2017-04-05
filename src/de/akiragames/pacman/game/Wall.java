@@ -9,7 +9,7 @@ public class Wall {
 	private int posX1, posY1, posX2, posY2;
 	private Screen screen;
 	
-	private Color color = Color.BLUE;
+	private Color color;
 	
 	public Wall(int posX1, int posY1, int posX2, int posY2, Screen screen) {
 		this.posX1 = posX1;
@@ -18,6 +18,17 @@ public class Wall {
 		this.posY2 = posY2;
 		
 		this.screen = screen;
+		this.color = Color.BLUE;
+	}
+	
+	public Wall(int posX1, int posY1, int posX2, int posY2, Color color, Screen screen) {
+		this.posX1 = posX1;
+		this.posY1 = posY1;
+		this.posX2 = posX2;
+		this.posY2 = posY2;
+		
+		this.screen = screen;
+		this.color = color;
 	}
 	
 	public void render() {

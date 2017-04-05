@@ -10,14 +10,9 @@ import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
 import de.akiragames.pacman.entity.Entity;
-import de.akiragames.pacman.entity.Ghost;
 import de.akiragames.pacman.entity.LivingEntity;
-import de.akiragames.pacman.entity.PacDot;
-import de.akiragames.pacman.entity.PacMan;
-import de.akiragames.pacman.entity.PowerUp;
-import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.game.EntityCollisionChecker;
-import de.akiragames.pacman.game.Wall;
+import de.akiragames.pacman.game.Game;
 import de.akiragames.pacman.game.WallCollisionChecker;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
@@ -32,8 +27,9 @@ public class Main extends Canvas implements Runnable {
 	public static final String VERSION = "inDev";
 
 	// Fenster-Parameter
-	public static final int WIDTH = 600;
-	public static final int HEIGHT = WIDTH / 4 * 3;
+	public static final int WIDTH = 528;
+	public static final int HEIGHT = 350;
+	public static final int SCALE = 1;
 
 	// Nur für Update-Check
 	public static String newVersion = VERSION;
@@ -47,22 +43,10 @@ public class Main extends Canvas implements Runnable {
 	private static Keyboard keyboard;
 	
 	private Screen screen;
+	private Game game;
 	
 	public static WallCollisionChecker wallCollisionChecker;
 	public static EntityCollisionChecker entityCollisionChecker;
-	
-	private Wall[] testWalls;
-	private PacMan testPacMan;
-	private Ghost testGhost1;
-	private Ghost testGhost2;
-	private Ghost testGhost3;
-	private Ghost testGhost4;
-	private Ghost testGhost5;
-	private PowerUp testPowerUp1;
-	private PowerUp testPowerUp2;
-	private PowerUp testPowerUp3;
-	private PowerUp testPowerUp4;
-	private PacDot[] testPacDots = new PacDot[5];
 
 	public static BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) Main.image.getRaster().getDataBuffer()).getData();
@@ -70,38 +54,18 @@ public class Main extends Canvas implements Runnable {
 	//////////////////////////////////////////////////////////////////////////
 
 	public Main() {
-		Dimension size = new Dimension(WIDTH, HEIGHT);
+		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
 		setPreferredSize(size);
 
 		this.screen = new Screen(WIDTH, HEIGHT);
 		this.frame = new JFrame();
 		
+		this.game = new Game(this.screen);
+		
 		Main.keyboard = new Keyboard(this);
 		
-		this.testWalls = new Wall[]{new Wall(0, 120, 350, 152, this.screen), new Wall(0, 350, 350, 382, this.screen), new Wall(60, 152, 92, 318, this.screen)};
-		this.testPacMan = new PacMan(100, 100, this.screen);
-		this.testGhost1 = new Ghost(200, 400, this.screen, Direction.UP, 1);
-		this.testGhost2 = new Ghost(400, 50, this.screen, Direction.DOWN, 2);
-		this.testGhost3 = new Ghost(500, 200, this.screen, Direction.LEFT, 3);
-		this.testGhost4 = new Ghost(16, 200, this.screen, Direction.RIGHT, 4);
-		this.testGhost5 = new Ghost(200, 250, this.screen, Direction.RIGHT, 5);
-		this.testPowerUp1 = new PowerUp(200, 200, this.screen);
-		this.testPowerUp2 = new PowerUp(400, 200, this.screen);
-		this.testPowerUp3 = new PowerUp(200, 300, this.screen);
-		this.testPowerUp4 = new PowerUp(400, 300, this.screen);
-			
-		for (int i = 0; i < this.testPacDots.length; i++) {
-			this.testPacDots[i] = new PacDot(250 + i * 25, 250, this.screen);
-		}
-		
-		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.testPacMan, this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5}, this.testWalls);
-		Main.entityCollisionChecker = new EntityCollisionChecker(this.testPacMan, new Entity[]{this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5});
-		
-		Main.entityCollisionChecker.addEntity(this.testPowerUp1);
-		Main.entityCollisionChecker.addEntity(this.testPowerUp2);
-		Main.entityCollisionChecker.addEntity(this.testPowerUp3);
-		Main.entityCollisionChecker.addEntity(this.testPowerUp4);
-		Main.entityCollisionChecker.addEntities(this.testPacDots);
+		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.game.getPacMan()}, this.game.getWalls());
+		Main.entityCollisionChecker = new EntityCollisionChecker(this.game.getPacMan(), new Entity[]{});
 		
 		addKeyListener(Main.keyboard);
 	}
@@ -189,16 +153,7 @@ public class Main extends Canvas implements Runnable {
 		Main.wallCollisionChecker.check();
 		Main.entityCollisionChecker.check();
 		
-		this.testPacMan.update();
-		this.testPowerUp1.update();
-		this.testPowerUp2.update();
-		this.testPowerUp3.update();
-		this.testPowerUp4.update();
-		this.testGhost1.update();
-		this.testGhost2.update();
-		this.testGhost3.update();
-		this.testGhost4.update();
-		this.testGhost5.update();
+		this.game.update();
 	}
 
 	public void render() {
@@ -210,25 +165,7 @@ public class Main extends Canvas implements Runnable {
 		}
 		
 		this.screen.clear();
-		
-		for (int i = 0; i < this.testWalls.length; i++) {
-			this.testWalls[i].render();
-		}
-		
-		for (int i = 0; i < this.testPacDots.length; i++) {
-			this.testPacDots[i].render();
-		}
-		
-		this.testPowerUp1.render();
-		this.testPowerUp2.render();
-		this.testPowerUp3.render();
-		this.testPowerUp4.render();
-		this.testGhost1.render(0);
-		this.testGhost2.render(1);
-		this.testGhost3.render(2);
-		this.testGhost4.render(3);
-		this.testGhost5.render(4);
-		this.testPacMan.renderAnimation();
+		this.game.render();
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = this.screen.getPixels()[i];

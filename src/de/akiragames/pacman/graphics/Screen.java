@@ -42,7 +42,7 @@ public class Screen {
 	 * Rendert einen Text.
 	 */
 	public void renderText(String text, int posX, int posY, int fontSize, Color fontColor) {
-		BufferedImage image = new BufferedImage(Main.WIDTH - posX, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = image.getGraphics();
 		
 		int w = image.getWidth();
@@ -70,12 +70,6 @@ public class Screen {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Rendert das Labyrinth.
-	 */
-	public void renderLevel() {
 	}
 	
 	/**
