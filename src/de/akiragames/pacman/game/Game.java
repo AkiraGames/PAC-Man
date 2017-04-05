@@ -2,6 +2,7 @@ package de.akiragames.pacman.game;
 
 import de.akiragames.pacman.Main;
 import de.akiragames.pacman.entity.PacMan;
+import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.utils.ProjectUtils;
 import de.akiragames.pacman.utils.Utils;
 
@@ -11,13 +12,14 @@ public class Game {
 	private int gameScore, gameStart;
 	private int lives, ghostsEaten, powerUpsEaten;
 	
+	private Screen screen;
 	private GameState gameState;
 	private PacMan pacman;
 	
 	// private Ghost[] ghosts;
 	// private PowerUp[] powerUps;
 	
-	public Game(PacMan pacman) {
+	public Game(Screen screen) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
 		this.gameStart = Utils.unixTime();
@@ -27,7 +29,22 @@ public class Game {
 		this.powerUpsEaten = 0;
 		
 		this.gameState = GameState.LOADING_SCREEN;
-		this.pacman = pacman;
+		this.screen = screen;
+		
+		this.pacman = new PacMan(Main.WIDTH / 2, Main.HEIGHT / 2, screen);
+	}
+	
+	// Methode, wenn PacMan stirbt
+	public void die() {
+		if (this.lives > 1) {
+			this.lives--;
+		} else {
+			this.gameOver();
+		}
+	}
+	
+	private void gameOver() {
+		
 	}
 	
 	// Score um "points" erhöhen
@@ -52,6 +69,16 @@ public class Game {
 		}
 	}
 	
+	public void update() {
+		this.pacman.update();
+	}
+	
+	public void render() {
+		this.pacman.renderAnimation();
+	}
+	
+	///////////////////////////////////////////////
+	
 	public int getScore() {
 		return this.gameScore;
 	}
@@ -74,6 +101,10 @@ public class Game {
 	
 	public GameState getGameState() {
 		return this.gameState;
+	}
+	
+	public Screen getScreen() {
+		return this.screen;
 	}
 
 }

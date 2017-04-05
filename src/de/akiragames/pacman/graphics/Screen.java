@@ -42,7 +42,7 @@ public class Screen {
 	 * Rendert einen Text.
 	 */
 	public void renderText(String text, int posX, int posY, int fontSize, Color fontColor) {
-		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(Main.WIDTH - posX, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = image.getGraphics();
 		
 		int w = image.getWidth();
@@ -119,6 +119,13 @@ public class Screen {
 	 */
 	public Color getAlphaColor() {
 		return new Color(0xff00ff);
+	}
+	
+	/**
+	 * Gibt die Entfernung zwischen zwei Punkten zurück.
+	 */
+	public int getDistance(int x1, int y1, int x2, int y2) {
+		return (int) Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
 	}
 
 }

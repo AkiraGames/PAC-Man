@@ -1,7 +1,6 @@
 package de.akiragames.pacman;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -10,18 +9,19 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import de.akiragames.pacman.entity.Entity;
 import de.akiragames.pacman.entity.Ghost;
 import de.akiragames.pacman.entity.LivingEntity;
 import de.akiragames.pacman.entity.PacDot;
 import de.akiragames.pacman.entity.PacMan;
 import de.akiragames.pacman.entity.PowerUp;
 import de.akiragames.pacman.game.Direction;
+import de.akiragames.pacman.game.EntityCollisionChecker;
 import de.akiragames.pacman.game.Wall;
 import de.akiragames.pacman.game.WallCollisionChecker;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
 import de.akiragames.pacman.utils.ProjectUtils;
-import de.akiragames.pacman.utils.Utils;
 
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -49,6 +49,7 @@ public class Main extends Canvas implements Runnable {
 	private Screen screen;
 	
 	public static WallCollisionChecker wallCollisionChecker;
+	public static EntityCollisionChecker entityCollisionChecker;
 	
 	private Wall[] testWalls;
 	private PacMan testPacMan;
@@ -88,12 +89,19 @@ public class Main extends Canvas implements Runnable {
 		this.testPowerUp2 = new PowerUp(400, 200, this.screen);
 		this.testPowerUp3 = new PowerUp(200, 300, this.screen);
 		this.testPowerUp4 = new PowerUp(400, 300, this.screen);
-		
-		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.testPacMan, this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5}, this.testWalls);
-	
+			
 		for (int i = 0; i < this.testPacDots.length; i++) {
 			this.testPacDots[i] = new PacDot(250 + i * 25, 250, this.screen);
 		}
+		
+		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.testPacMan, this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5}, this.testWalls);
+		Main.entityCollisionChecker = new EntityCollisionChecker(this.testPacMan, new Entity[]{this.testGhost1, this.testGhost2, this.testGhost3, this.testGhost4, this.testGhost5});
+		
+		Main.entityCollisionChecker.addEntity(this.testPowerUp1);
+		Main.entityCollisionChecker.addEntity(this.testPowerUp2);
+		Main.entityCollisionChecker.addEntity(this.testPowerUp3);
+		Main.entityCollisionChecker.addEntity(this.testPowerUp4);
+		Main.entityCollisionChecker.addEntities(this.testPacDots);
 		
 		addKeyListener(Main.keyboard);
 	}
@@ -177,7 +185,9 @@ public class Main extends Canvas implements Runnable {
 
 	public void update() {
 		Main.keyboard.update();
+		
 		Main.wallCollisionChecker.check();
+		Main.entityCollisionChecker.check();
 		
 		this.testPacMan.update();
 		this.testPowerUp1.update();
@@ -219,8 +229,6 @@ public class Main extends Canvas implements Runnable {
 		this.testGhost4.render(3);
 		this.testGhost5.render(4);
 		this.testPacMan.renderAnimation();
-		
-		this.screen.renderText("Unix Time: " + Utils.unixTime(), 20, 20, 30, Color.WHITE);
 		
 		for (int i = 0; i < this.pixels.length; i++) {
 			this.pixels[i] = this.screen.getPixels()[i];
