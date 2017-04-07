@@ -2,8 +2,8 @@ package de.akiragames.pacman.entity;
 
 import java.awt.image.BufferedImage;
 
-import de.akiragames.pacman.Main;
 import de.akiragames.pacman.game.Direction;
+import de.akiragames.pacman.game.Game;
 import de.akiragames.pacman.graphics.Screen;
 
 public class PacMan extends LivingEntity {
@@ -16,8 +16,8 @@ public class PacMan extends LivingEntity {
 	private BufferedImage[] imagesDown;
 	private BufferedImage[] imagesLeft;
 
-	public PacMan(int posX, int posY, Screen screen) {
-		super(posX, posY, screen, new String[]{
+	public PacMan(int gridX, int gridY, Screen screen, Game game) {
+		super(gridX, gridY, screen, game, new String[]{
 				"pacman/pacman_1.png", "pacman/pacman_2.png", "pacman/pacman_3.png", 
 				"pacman/pacman_4.png", "pacman/pacman_5.png", "pacman/pacman_6.png", 
 				"pacman/pacman_7.png", "pacman/pacman_8.png", "pacman/pacman_9.png", 
@@ -32,8 +32,6 @@ public class PacMan extends LivingEntity {
 		this.imagesRight = new BufferedImage[]{this.images[0], this.images[4], this.images[5], this.images[6]};
 		this.imagesDown = new BufferedImage[]{this.images[0], this.images[7], this.images[8], this.images[9]};
 		this.imagesLeft = new BufferedImage[]{this.images[0], this.images[10], this.images[11], this.images[12]};
-		
-		this.changeDirection(Direction.RIGHT);
 	}
 
 	public void update() {
@@ -42,7 +40,7 @@ public class PacMan extends LivingEntity {
 	}
 
 	public void renderAnimation() {
-		if (!this.isMoving) {
+		if (!this.isMoving()) {
 			this.anim = 2;
 			this.counter = 0;
 			this.animUp = false;
@@ -117,63 +115,6 @@ public class PacMan extends LivingEntity {
 					this.anim--;
 				}
 			}
-		}
-	}
-	
-	private void updateMovement() {
-		int xOffset = this.images[0].getWidth() / 2;
-		int yOffset = this.images[0].getHeight() / 2;
-		
-		if (Main.getKeyboard().up) {
-			if (this.getDirection() != Direction.UP) {
-				this.changeDirection(Direction.UP);
-				return;
-			}
-			
-			if (this.posY > yOffset && !Main.wallCollisionChecker.getDirections()[0][0]) {
-				this.posY -= this.getSpeed();
-				this.isMoving = true;
-			} else {
-				this.isMoving = false;
-			}
-		} else if (Main.getKeyboard().down) {
-			if (this.getDirection() != Direction.DOWN) {
-				this.changeDirection(Direction.DOWN);
-				return;
-			}
-			
-			if (this.posY < this.screen.getHeight() - yOffset && !Main.wallCollisionChecker.getDirections()[0][1]) {
-				this.posY += this.getSpeed();
-				this.isMoving = true;
-			} else {
-				this.isMoving = false;
-			}
-		} else if (Main.getKeyboard().left) {
-			if (this.getDirection() != Direction.LEFT) { 
-				this.changeDirection(Direction.LEFT);
-				return; 
-			}
-			
-			if (this.posX > xOffset && !Main.wallCollisionChecker.getDirections()[0][2]) {
-				this.posX -= this.getSpeed();
-				this.isMoving = true;
-			} else {
-				this.isMoving = false;
-			}
-		} else if (Main.getKeyboard().right) {
-			if (this.getDirection() != Direction.RIGHT) {
-				this.changeDirection(Direction.RIGHT);
-				return;
-			}
-			
-			if (this.posX < this.screen.getWidth() - xOffset && !Main.wallCollisionChecker.getDirections()[0][3]) {
-				this.posX += this.getSpeed();
-				this.isMoving = true;
-			} else {
-				this.isMoving = false;
-			}
-		} else {
-			this.isMoving = false;
 		}
 	}
 

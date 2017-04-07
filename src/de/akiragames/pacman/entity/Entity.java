@@ -2,20 +2,22 @@ package de.akiragames.pacman.entity;
 
 import java.awt.image.BufferedImage;
 
-import de.akiragames.pacman.Main;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.utils.FileUtils;
 
 public class Entity {
 	
-	protected int posX, posY;
+	protected int posX, posY, gridX, gridY;
 	protected Screen screen;
 	protected BufferedImage[] images;
 	private boolean imagesContainAlphaColor;
 	
-	public Entity(int posX, int posY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
-		this.posX = posX;
-		this.posY = posY;
+	public Entity(int gridX, int gridY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
+		this.gridX = gridX;
+		this.gridY = gridY;
+		this.posX = gridX * 32 + 16;
+		this.posY = gridY * 32 + 16;
+		
 		this.screen = screen;
 		
 		this.images = FileUtils.loadImages(imageFiles);
@@ -23,7 +25,7 @@ public class Entity {
 	}
 	
 	public void render(int imageIndex) {
-		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
+//		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
 			int[] pixels = this.screen.getPixels();
 			
 			int w = this.images[imageIndex].getWidth();
@@ -47,7 +49,7 @@ public class Entity {
 			}
 			
 			this.screen.changePixels(pixels);
-		}
+//		}
 	}
 	
 	/////////////////////////////////////////////////
@@ -58,6 +60,14 @@ public class Entity {
 	
 	public int getPosY() {
 		return this.posY;
+	}
+	
+	public int getGridX() {
+		return this.gridX;
+	}
+	
+	public int getGridY() {
+		return this.gridY;
 	}
 	
 	public Screen getScreen() {

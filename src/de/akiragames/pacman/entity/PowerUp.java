@@ -1,18 +1,17 @@
 package de.akiragames.pacman.entity;
 
-import de.akiragames.pacman.Main;
 import de.akiragames.pacman.graphics.Screen;
 
 public class PowerUp extends Entity {
 	
 	private int counter, anim;
 
-	public PowerUp(int posX, int posY, Screen screen) {
-		super(posX, posY, screen, new String[]{"map/powerup.png"}, true);
+	public PowerUp(int gridX, int gridY, Screen screen) {
+		super(gridX, gridY, screen, new String[]{"map/powerup.png"}, true);
 	}
 	
 	public void render() {
-		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
+//		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
 			int[] pixels = this.screen.getPixels();
 			
 			int w = this.images[0].getWidth();
@@ -38,7 +37,7 @@ public class PowerUp extends Entity {
 				
 				this.screen.changePixels(pixels);
 			}
-		}
+//		}
 	}
 	
 	public void update() {

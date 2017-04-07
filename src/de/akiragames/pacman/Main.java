@@ -6,14 +6,11 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-import de.akiragames.pacman.entity.Entity;
-import de.akiragames.pacman.entity.LivingEntity;
-import de.akiragames.pacman.game.EntityCollisionChecker;
 import de.akiragames.pacman.game.Game;
-import de.akiragames.pacman.game.WallCollisionChecker;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.input.Keyboard;
 import de.akiragames.pacman.utils.ProjectUtils;
@@ -27,8 +24,8 @@ public class Main extends Canvas implements Runnable {
 	public static final String VERSION = "inDev";
 
 	// Fenster-Parameter
-	public static final int WIDTH = 528;
-	public static final int HEIGHT = 350;
+	public static final int WIDTH = 20 * 32;
+	public static final int HEIGHT = 11 * 32 + 40;
 	public static final int SCALE = 1;
 
 	// Nur für Update-Check
@@ -39,14 +36,13 @@ public class Main extends Canvas implements Runnable {
 	private JFrame frame;
 	private boolean running = false;
 	
+	private HashMap<Integer, Integer> fpsList;
+	
 	// Input-Manager
 	private static Keyboard keyboard;
 	
 	private Screen screen;
 	private Game game;
-	
-	public static WallCollisionChecker wallCollisionChecker;
-	public static EntityCollisionChecker entityCollisionChecker;
 
 	public static BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) Main.image.getRaster().getDataBuffer()).getData();
@@ -61,11 +57,9 @@ public class Main extends Canvas implements Runnable {
 		this.frame = new JFrame();
 		
 		this.game = new Game(this.screen);
+		this.fpsList = new HashMap<Integer, Integer>();
 		
 		Main.keyboard = new Keyboard(this);
-		
-		Main.wallCollisionChecker = new WallCollisionChecker(new LivingEntity[]{this.game.getPacMan()}, this.game.getWalls());
-		Main.entityCollisionChecker = new EntityCollisionChecker(this.game.getPacMan(), new Entity[]{});
 		
 		addKeyListener(Main.keyboard);
 	}
@@ -139,6 +133,8 @@ public class Main extends Canvas implements Runnable {
 				
 				this.frame.setTitle(NAME + " " + VERSION + " [ " + updates + " ups | " + frames + " fps ]");
 				
+				this.fpsList.put(this.fpsList.size(), frames);
+				
 				updates = 0;
 				frames = 0;
 			}
@@ -147,12 +143,7 @@ public class Main extends Canvas implements Runnable {
 		this.stop();
 	}
 
-	public void update() {
-		Main.keyboard.update();
-		
-		Main.wallCollisionChecker.check();
-		Main.entityCollisionChecker.check();
-		
+	public void update() {		
 		this.game.update();
 	}
 
@@ -189,6 +180,20 @@ public class Main extends Canvas implements Runnable {
 	
 	public Screen getScreen() {
 		return this.screen;
+	}
+	
+	public Game getGame() {
+		return this.game;
+	}
+	
+	public double getAverageFPS() {
+		double sum = 0.0D;
+		
+		for (int i = 0; i < this.fpsList.size(); i++) {
+			sum += this.fpsList.get(i);
+		}
+		
+		return (double) sum / this.fpsList.size();
 	}
 
 }
