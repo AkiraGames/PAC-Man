@@ -136,7 +136,7 @@ public class Map {
 				for (int x = 0 * 32; x < this.image.getWidth(); x++) {
 					if (x >= 0 && x < this.screen.getWidth()) {
 						if (pixels[x + y * this.image.getWidth()] == Color.BLUE.getRGB())
-							blocks.add(new WallBlock(x, y, this.screen));
+							blocks.add(new WallBlock(x, y, this));
 					}
 				}
 			}
