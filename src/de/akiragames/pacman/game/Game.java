@@ -3,7 +3,6 @@ package de.akiragames.pacman.game;
 import java.awt.Color;
 
 import de.akiragames.pacman.Main;
-import de.akiragames.pacman.entity.Map;
 import de.akiragames.pacman.graphics.Screen;
 import de.akiragames.pacman.utils.ProjectUtils;
 import de.akiragames.pacman.utils.Utils;
@@ -19,9 +18,6 @@ public class Game {
 	
 	private Map map;
 	
-	// private Ghost[] ghosts;
-	// private PowerUp[] powerUps;
-	
 	public Game(Screen screen) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
@@ -34,7 +30,7 @@ public class Game {
 		this.gameState = GameState.LOADING_SCREEN;
 		this.screen = screen;
 		
-		this.map = new Map(this, this.screen);
+		this.map = new Map(this);
 	}
 	
 	// Methode, wenn PacMan stirbt
@@ -56,7 +52,7 @@ public class Game {
 	}
 	
 	// Methode zum Speichern des Scores
-	public void saveToDatabase(String playerName) {
+	public void saveToDatabase(String playerName, double avergaeFPS) {
 		int duration = Utils.unixTime() - this.gameStart;
 		
 		String urlString = Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/addscore.php?gameId=" + this.gameId + "&gameVersion=" + Main.VERSION + "&playerName=" + playerName + "&gameScore=" + this.gameScore + "&gameStart=" + this.gameStart + "&gameDuration=" + duration + "&livesLeft=" + this.getLives() + "&ghostsEaten=" + this.getGhostsEaten();

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.game.Game;
-import de.akiragames.pacman.graphics.Screen;
 
 public class LivingEntity extends Entity {
 	
@@ -12,17 +11,15 @@ public class LivingEntity extends Entity {
 	private boolean isMovingX, isMovingY;
 	private Direction direction;
 	private int desiredGridX, desiredGridY;
-	private Game game;
 	
-	public LivingEntity(int gridX, int gridY, Screen screen, Game game, String[] imageFiles, boolean imagesContainAlphaColor) {
-		super(gridX, gridY, screen, imageFiles, imagesContainAlphaColor);
+	public LivingEntity(int gridX, int gridY, Game game, String[] imageFiles, boolean imagesContainAlphaColor) {
+		super(gridX, gridY, game, imageFiles, imagesContainAlphaColor);
 		
 		this.speed = 2;
 		this.isMovingX = false;
 		this.isMovingY = false;
 		
 		this.direction = Direction.RIGHT;
-		this.game = game;
 		
 		this.desiredGridX = this.gridX;
 		this.desiredGridY = this.gridY;
@@ -234,10 +231,6 @@ public class LivingEntity extends Entity {
 	
 	public Direction getDirection() {
 		return this.direction;
-	}
-	
-	public Game getGame() {
-		return this.game;
 	}
 	
 	public int getSpeed() {

@@ -2,23 +2,23 @@ package de.akiragames.pacman.entity;
 
 import java.awt.image.BufferedImage;
 
-import de.akiragames.pacman.graphics.Screen;
+import de.akiragames.pacman.game.Game;
 import de.akiragames.pacman.utils.FileUtils;
 
 public class Entity {
 	
 	protected int posX, posY, gridX, gridY;
-	protected Screen screen;
+	protected Game game;
 	protected BufferedImage[] images;
 	private boolean imagesContainAlphaColor;
 	
-	public Entity(int gridX, int gridY, Screen screen, String[] imageFiles, boolean imagesContainAlphaColor) {
+	public Entity(int gridX, int gridY, Game game, String[] imageFiles, boolean imagesContainAlphaColor) {
 		this.gridX = gridX;
 		this.gridY = gridY;
 		this.posX = gridX * 32 + 16;
 		this.posY = gridY * 32 + 16;
 		
-		this.screen = screen;
+		this.game = game;
 		
 		this.images = FileUtils.loadImages(imageFiles);
 		this.imagesContainAlphaColor = imagesContainAlphaColor;
@@ -26,7 +26,7 @@ public class Entity {
 	
 	public void render(int imageIndex) {
 //		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
-			int[] pixels = this.screen.getPixels();
+			int[] pixels = this.game.getScreen().getPixels();
 			
 			int w = this.images[imageIndex].getWidth();
 			int h = this.images[imageIndex].getHeight();
@@ -38,17 +38,17 @@ public class Entity {
 			int yOffset = this.posY - h / 2;
 			
 			for (int y = yOffset; y < this.posY + h / 2; y++) {
-				if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
+				if (y >= 0 && y < this.game.getScreen().getHeight() && y < h + yOffset) {
 					for (int x = xOffset; x < this.posX + w / 2; x++) {
-						if (x >= 0 && x < this.screen.getWidth() && x < w + xOffset) {
-							if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.screen.getAlphaColor().getRGB())
-								pixels[x + y * this.screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+						if (x >= 0 && x < this.game.getScreen().getWidth() && x < w + xOffset) {
+							if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.game.getScreen().getAlphaColor().getRGB())
+								pixels[x + y * this.game.getScreen().getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
 						}
 					}
 				}
 			}
 			
-			this.screen.changePixels(pixels);
+			this.game.getScreen().changePixels(pixels);
 //		}
 	}
 	
@@ -70,8 +70,8 @@ public class Entity {
 		return this.gridY;
 	}
 	
-	public Screen getScreen() {
-		return this.screen;
+	public Game getGame() {
+		return this.game;
 	}
 	
 	public BufferedImage[] getImages() {

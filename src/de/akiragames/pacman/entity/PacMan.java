@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.game.Game;
-import de.akiragames.pacman.graphics.Screen;
 
 public class PacMan extends LivingEntity {
 	
@@ -16,8 +15,8 @@ public class PacMan extends LivingEntity {
 	private BufferedImage[] imagesDown;
 	private BufferedImage[] imagesLeft;
 
-	public PacMan(int gridX, int gridY, Screen screen, Game game) {
-		super(gridX, gridY, screen, game, new String[]{
+	public PacMan(int gridX, int gridY, Game game) {
+		super(gridX, gridY, game, new String[]{
 				"pacman/pacman_1.png", "pacman/pacman_2.png", "pacman/pacman_3.png", 
 				"pacman/pacman_4.png", "pacman/pacman_5.png", "pacman/pacman_6.png", 
 				"pacman/pacman_7.png", "pacman/pacman_8.png", "pacman/pacman_9.png", 
@@ -64,7 +63,7 @@ public class PacMan extends LivingEntity {
 			}
 			
 		} else {
-			int[] pixels = this.screen.getPixels();
+			int[] pixels = this.game.getScreen().getPixels();
 			
 			int w = this.imagesUp[this.anim].getWidth();
 			int h = this.imagesUp[this.anim].getHeight();
@@ -84,17 +83,17 @@ public class PacMan extends LivingEntity {
 			int yOffset = this.posY - h / 2;
 			
 			for (int y = yOffset; y < this.posY + h / 2; y++) {
-				if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
+				if (y >= 0 && y < this.game.getScreen().getHeight() && y < h + yOffset) {
 					for (int x = xOffset; x < this.posX + w / 2; x++) {
-						if (x >= 0 && x < this.screen.getWidth() && x < w + xOffset) {
-							if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.screen.getAlphaColor().getRGB())
-								pixels[x + y * this.screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+						if (x >= 0 && x < this.game.getScreen().getWidth() && x < w + xOffset) {
+							if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.game.getScreen().getAlphaColor().getRGB())
+								pixels[x + y * this.game.getScreen().getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
 						}
 					}
 				}
 			}
 			
-			this.screen.changePixels(pixels);
+			this.game.getScreen().changePixels(pixels);
 		}
 	}
 	

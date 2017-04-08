@@ -193,7 +193,7 @@ public class Main extends Canvas implements Runnable {
 			sum += this.fpsList.get(i);
 		}
 		
-		return (double) sum / this.fpsList.size();
+		return Math.round((double) sum / this.fpsList.size()) / 100.0;
 	}
 
 }

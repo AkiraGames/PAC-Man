@@ -1,18 +1,21 @@
 package de.akiragames.pacman.entity;
 
-import de.akiragames.pacman.graphics.Screen;
+import de.akiragames.pacman.game.Game;
 
 public class PowerUp extends Entity {
 	
 	private int counter, anim;
+	private boolean pacManCollision;
 
-	public PowerUp(int gridX, int gridY, Screen screen) {
-		super(gridX, gridY, screen, new String[]{"map/powerup.png"}, true);
+	public PowerUp(int gridX, int gridY, Game game) {
+		super(gridX, gridY, game, new String[]{"map/powerup.png"}, true);
+		
+		this.pacManCollision = false;
 	}
 	
 	public void render() {
-//		if (!Main.entityCollisionChecker.isCollidingWithPacMan(this)) {
-			int[] pixels = this.screen.getPixels();
+		if (!this.pacManCollision) {
+			int[] pixels = this.game.getScreen().getPixels();
 			
 			int w = this.images[0].getWidth();
 			int h = this.images[0].getHeight();
@@ -25,25 +28,37 @@ public class PowerUp extends Entity {
 			
 			if (this.anim % 4 < 2) {
 				for (int y = yOffset; y < this.posY + h / 2; y++) {
-					if (y >= 0 && y < this.screen.getHeight() && y < h + yOffset) {
+					if (y >= 0 && y < this.game.getScreen().getHeight() && y < h + yOffset) {
 						for (int x = xOffset; x < this.posX + w / 2; x++) {
-							if (x >= 0 && x < this.screen.getWidth() && x < w + xOffset) {
-								if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.screen.getAlphaColor().getRGB())
-									pixels[x + y * this.screen.getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
+							if (x >= 0 && x < this.game.getScreen().getWidth() && x < w + xOffset) {
+								if (imagePixels[(x - xOffset) + (y - yOffset) * w] != this.game.getScreen().getAlphaColor().getRGB())
+									pixels[x + y * this.game.getScreen().getWidth()] = imagePixels[(x - xOffset) + (y - yOffset) * w];
 							}
 						}
 					}
 				}
 				
-				this.screen.changePixels(pixels);
+				this.game.getScreen().changePixels(pixels);
 			}
-//		}
+		}
 	}
 	
 	public void update() {
-		this.counter++;
+		if (this.game.getMap().getCollisionChecker().isCollidingWithPacMan(this) && !this.pacManCollision) {
+			this.pacManCollision = true;
+			
+			this.game.scoreUp(20);
+		} else {
+			this.counter++;
+			
+			if (this.counter % 6 == 0) this.anim++;
+		}
+	}
+	
+	/////////////////////////////////////////////////
 		
-		if (this.counter % 6 == 0) this.anim++;
+	public boolean isCollidingPacMan() {
+		return this.pacManCollision;
 	}
 
 }

@@ -6,13 +6,13 @@ import de.akiragames.pacman.entity.Entity;
 import de.akiragames.pacman.entity.PacDot;
 import de.akiragames.pacman.entity.PacMan;
 
-public class EntityCollisionChecker {
+public class CollisionChecker {
 	
 	private PacMan pacman;
 	private Entity[] entities;
 	private ArrayList<Entity> collisions; // Kollisionsvariablen für die Entities (boolean)
 	
-	public EntityCollisionChecker(PacMan pacman, Entity[] entities) {
+	public CollisionChecker(PacMan pacman, Entity[] entities) {
 		this.pacman = pacman;
 		this.entities = entities;
 		
@@ -28,7 +28,7 @@ public class EntityCollisionChecker {
 		for (int i = 0; i < this.entities.length; i++) {
 			Entity entity = this.entities[i];
 			
-			if (this.pacman.getScreen().getDistance(this.pacman.getPosX(), this.pacman.getPosY(), entity.getPosX(), entity.getPosY()) <= offset - (entity instanceof PacDot ? 4 : 0)) {
+			if (this.pacman.getGame().getScreen().getDistance(this.pacman.getPosX(), this.pacman.getPosY(), entity.getPosX(), entity.getPosY()) <= offset - (entity instanceof PacDot ? 4 : 0)) {
 				if (!this.collisions.contains(entity)) this.collisions.add(entity);
 			} else {
 				if (this.collisions.contains(entity)) this.collisions.remove(entity);
