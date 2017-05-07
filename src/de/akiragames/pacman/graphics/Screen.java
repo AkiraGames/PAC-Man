@@ -14,20 +14,53 @@ import de.akiragames.pacman.utils.Utils;
 
 public class Screen {
 
+	private Main main;
+	
 	private int width, height;
 	private int[] pixels;
 
-	public Screen(int width, int height) {
+	public Screen(Main main, int width, int height) {
+		this.main = main;
+		
 		this.width = width;
 		this.height = height;
 
 		this.pixels = new int[width * height];
 	}
 	
-	public void clear() {
+	public void clearFull() {
 		for (int i = 0; i < this.pixels.length; i++) {
 			pixels[i] = 0;
 		}
+	}
+	
+	private void clearArea(int startX, int startY, int width, int height) {
+		for (int y = startY; y < startY + height; y++) {
+			if (y >= 0 && y < this.height && y < startY + height) {
+				for (int x = startX; x < startX + width; x++) {
+					if (x >= 0 && x < this.width && x < startX + width) {
+						this.pixels[x + y * this.width] = 0;
+					}
+				}
+			}
+		}
+	}
+	
+	public void clearKeepWalls() {
+		for (int y = 1; y < this.main.getGame().getMap().getHeight() - 1; y++) {
+			if (y >= 0 && y < this.height) {
+				for (int x = 1; x < this.main.getGame().getMap().getWidth() - 1; x++) {
+					if (x >= 0 && x < this.width) {
+						if (!this.main.getGame().getMap().isWallBlock(x, y)) {
+							this.clearArea((x + 0) * 32, (y + 0) * 32, 32, 32);
+						}
+					}
+				}
+			}
+		}
+		
+		// Score, Zeit und Leben werden "gecleart"
+		this.clearArea(0, this.main.getGame().getMap().getHeight() * 32, this.width, 40);
 	}
 	
 	public void changePixels(int[] pixels) {
@@ -91,6 +124,10 @@ public class Screen {
 	}
 	
 	/////////////////////////////////////////
+	
+	public Main getMain() {
+		return this.main;
+	}
 
 	public int getWidth() {
 		return this.width;

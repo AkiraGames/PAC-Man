@@ -53,7 +53,7 @@ public class Main extends Canvas implements Runnable {
 		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
 		setPreferredSize(size);
 
-		this.screen = new Screen(WIDTH, HEIGHT);
+		this.screen = new Screen(this, WIDTH, HEIGHT);
 		this.frame = new JFrame();
 		
 		this.game = new Game(this.screen);
@@ -155,7 +155,7 @@ public class Main extends Canvas implements Runnable {
 			return;
 		}
 		
-		this.screen.clear();
+		this.screen.clearKeepWalls();
 		this.game.render();
 		
 		for (int i = 0; i < this.pixels.length; i++) {

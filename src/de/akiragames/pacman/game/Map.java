@@ -11,7 +11,8 @@ import de.akiragames.pacman.utils.FileUtils;
 
 public class Map {
 
-	private BufferedImage image;
+	private BufferedImage pattern, labyrinth;
+	
 	private Game game;
 	private int width, height;
 	
@@ -24,11 +25,15 @@ public class Map {
 	private PacDot[] pacDots;
 	
 	public Map(Game game) {
-		this.image = FileUtils.loadImages(new String[]{"map/labyrinth.png"})[0];
+		BufferedImage[] images = FileUtils.loadImages(new String[]{"map/pattern.png", "map/labyrinth.png"});
+		
+		this.pattern = images[0];
+		this.labyrinth = images[1];
+		
 		this.game = game;
 		
-		this.width = this.image.getWidth();
-		this.height = this.image.getHeight();
+		this.width = this.pattern.getWidth();
+		this.height = this.pattern.getHeight();
 		
 		this.pacman = this.loadPacMan();
 		
@@ -40,6 +45,8 @@ public class Map {
 		
 		this.collisionChecker = new CollisionChecker(this.pacman, this.pacDots);
 		this.collisionChecker.addEntities(this.powerUps);
+		
+		this.renderWalls();
 	}
 	
 	public void update() {
@@ -68,33 +75,50 @@ public class Map {
 		this.pacman.update();
 	}
 	
-	public void render() {
-		for (int i = 0; i < this.wallBlocks.length; i++) {
-			this.wallBlocks[i].render();
-		}
-		
+	public void render() {	
+		// PacDots
 		for (int i = 0; i < this.pacDots.length; i++) {
 			this.pacDots[i].render();
 		}
 		
+		// PowerUps
 		for (int i = 0; i < this.powerUps.length; i++) {
 			this.powerUps[i].render();
 		}
 		
+		// PacMan
 		this.pacman.renderAnimation();
+	}
+	
+	private void renderWalls() {
+		int[] pixels = this.getGame().getScreen().getPixels();
+		
+		for (int y = 0; y < this.height * 32; y++) {
+			if (y >= 0 && y < this.getGame().getScreen().getHeight()) {
+				for (int x = 0; x < this.width * 32; x++) {
+					if (x >= 0 && x < this.getGame().getScreen().getWidth()) {
+						if (this.labyrinth.getRGB(x, y) != 0) {
+							pixels[x + y * this.getGame().getScreen().getWidth()] = this.labyrinth.getRGB(x, y);
+						}
+					}
+				}
+			}
+		}
+		
+		this.getGame().getScreen().changePixels(pixels);
 	}
 	
 	private PacMan loadPacMan() {
 		PacMan pm = null;
-		int[] pixels = new int[this.image.getWidth() * this.image.getHeight()];
+		int[] pixels = new int[this.pattern.getWidth() * this.pattern.getHeight()];
 		
-		this.image.getRGB(0, 0, this.image.getWidth(), this.image.getHeight(), pixels, 0, this.image.getWidth());
+		this.pattern.getRGB(0, 0, this.pattern.getWidth(), this.pattern.getHeight(), pixels, 0, this.pattern.getWidth());
 		
-		for (int y = 0; y < this.image.getHeight(); y++) {
+		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.image.getWidth(); x++) {
+				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
-						if (pixels[x + y * this.image.getWidth()] == Color.RED.getRGB()) {
+						if (pixels[x + y * this.pattern.getWidth()] == Color.RED.getRGB()) {
 							pm = new PacMan(x, y, this.game);
 							break;
 						}
@@ -124,15 +148,15 @@ public class Map {
 	
 	private PacDot[] loadPacDots() {
 		ArrayList<PacDot> pd = new ArrayList<PacDot>();
-		int[] pixels = new int[this.image.getWidth() * this.image.getHeight()];
+		int[] pixels = new int[this.pattern.getWidth() * this.pattern.getHeight()];
 		
-		this.image.getRGB(0, 0, this.image.getWidth(), this.image.getHeight(), pixels, 0, this.image.getWidth());
+		this.pattern.getRGB(0, 0, this.pattern.getWidth(), this.pattern.getHeight(), pixels, 0, this.pattern.getWidth());
 		
-		for (int y = 0; y < this.image.getHeight(); y++) {
+		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.image.getWidth(); x++) {
+				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
-						if (pixels[x + y * this.image.getWidth()] == Color.BLACK.getRGB())
+						if (pixels[x + y * this.pattern.getWidth()] == Color.BLACK.getRGB())
 							pd.add(new PacDot(x, y, this.game));
 					}
 				}
@@ -144,15 +168,15 @@ public class Map {
 	
 	private PowerUp[] loadPowerUps() {
 		ArrayList<PowerUp> pu = new ArrayList<PowerUp>();
-		int[] pixels = new int[this.image.getWidth() * this.image.getHeight()];
+		int[] pixels = new int[this.pattern.getWidth() * this.pattern.getHeight()];
 		
-		this.image.getRGB(0, 0, this.image.getWidth(), this.image.getHeight(), pixels, 0, this.image.getWidth());
+		this.pattern.getRGB(0, 0, this.pattern.getWidth(), this.pattern.getHeight(), pixels, 0, this.pattern.getWidth());
 		
-		for (int y = 0; y < this.image.getHeight(); y++) {
+		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.image.getWidth(); x++) {
+				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
-						if (pixels[x + y * this.image.getWidth()] == Color.GREEN.getRGB())
+						if (pixels[x + y * this.pattern.getWidth()] == Color.GREEN.getRGB())
 							pu.add(new PowerUp(x, y, this.game));
 					}
 				}
@@ -164,15 +188,15 @@ public class Map {
 	
 	private WallBlock[] loadWalls() {
 		ArrayList<WallBlock> blocks = new ArrayList<WallBlock>();
-		int[] pixels = new int[this.image.getWidth() * this.image.getHeight()];
+		int[] pixels = new int[this.pattern.getWidth() * this.pattern.getHeight()];
 		
-		this.image.getRGB(0, 0, this.image.getWidth(), this.image.getHeight(), pixels, 0, this.image.getWidth());
+		this.pattern.getRGB(0, 0, this.pattern.getWidth(), this.pattern.getHeight(), pixels, 0, this.pattern.getWidth());
 		
-		for (int y = 0; y < this.image.getHeight(); y++) {
+		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.image.getWidth(); x++) {
+				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
-						if (pixels[x + y * this.image.getWidth()] == Color.BLUE.getRGB())
+						if (pixels[x + y * this.pattern.getWidth()] == Color.BLUE.getRGB())
 							blocks.add(new WallBlock(x, y, this));
 					}
 				}
@@ -184,8 +208,12 @@ public class Map {
 	
 	/////////////////////////////////////////////////
 	
-	public BufferedImage getImage() {
-		return this.image;
+	public BufferedImage getPattern() {
+		return this.pattern;
+	}
+	
+	public BufferedImage getLabyrinth() {
+		return this.labyrinth;
 	}
 	
 	public boolean isWallBlock(int gridX, int gridY) {
