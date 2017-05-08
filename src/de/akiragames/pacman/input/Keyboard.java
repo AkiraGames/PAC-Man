@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 
 import de.akiragames.pacman.Main;
 import de.akiragames.pacman.game.Direction;
+import de.akiragames.pacman.game.GameState;
 
 public class Keyboard implements KeyListener {
 	
@@ -17,7 +18,8 @@ public class Keyboard implements KeyListener {
 	}
 	
 	public void update(Direction direction) {		
-		this.main.getGame().getMap().getPacMan().changeDirection(direction);
+		if (this.main.getGame().getGameState() == GameState.IN_GAME || this.main.getGame().getGameState() == GameState.POWERUP_ACTIVE)
+			this.main.getGame().getMap().getPacMan().changeDirection(this.main.getGame().getMap(), direction);
 	}
 
 	public void keyPressed(KeyEvent e) {

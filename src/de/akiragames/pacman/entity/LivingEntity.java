@@ -4,13 +4,15 @@ import java.util.ArrayList;
 
 import de.akiragames.pacman.game.Direction;
 import de.akiragames.pacman.game.Game;
+import de.akiragames.pacman.game.GameState;
+import de.akiragames.pacman.game.Map;
 
 public class LivingEntity extends Entity {
 	
 	private int speed;
 	private boolean isMovingX, isMovingY;
 	private Direction direction;
-	private int desiredGridX, desiredGridY;
+	protected int desiredGridX, desiredGridY;
 	
 	public LivingEntity(int gridX, int gridY, Game game, String[] imageFiles, boolean imagesContainAlphaColor) {
 		super(gridX, gridY, game, imageFiles, imagesContainAlphaColor);
@@ -28,7 +30,7 @@ public class LivingEntity extends Entity {
 	/**
 	 * Ändert Richtung des LivingEntity.
 	 */
-	public void changeDirection(Direction newDirection) {
+	public void changeDirection(Map map, Direction newDirection) {
 		if (!this.isMoving() || newDirection == this.direction.invert()) {
 			if (newDirection != this.direction) {
 				this.direction = newDirection;
@@ -36,16 +38,16 @@ public class LivingEntity extends Entity {
 			
 			switch (newDirection) {
 				case DOWN:
-					this.desiredGridY = this.gridY + this.getShortestDistance(this.gridX, this.gridY);
+					this.desiredGridY = this.gridY + this.getShortestDistance(map, this.gridX, this.gridY);
 					break;
 				case UP:
-					this.desiredGridY = this.gridY - this.getShortestDistance(this.gridX, this.gridY);
+					this.desiredGridY = this.gridY - this.getShortestDistance(map, this.gridX, this.gridY);
 					break;
 				case RIGHT:
-					this.desiredGridX = this.gridX + this.getShortestDistance(this.gridX, this.gridY);
+					this.desiredGridX = this.gridX + this.getShortestDistance(map, this.gridX, this.gridY);
 					break;
 				case LEFT:
-					this.desiredGridX = this.gridX - this.getShortestDistance(this.gridX, this.gridY);
+					this.desiredGridX = this.gridX - this.getShortestDistance(map, this.gridX, this.gridY);
 					break;
 				default:
 					break;
@@ -53,31 +55,35 @@ public class LivingEntity extends Entity {
 		}
 	}
 	
-	private Direction[] getFreeDirections(int gridX, int gridY) {
+	public Direction[] getFreeDirections(Map map) {
+		return this.getFreeDirectionsInGrid(map, this.gridX, this.gridY);
+	}
+	
+	private Direction[] getFreeDirectionsInGrid(Map map, int gridX, int gridY) {
 		ArrayList<Direction> dirs = new ArrayList<Direction>();
 		
-		if (!this.game.getMap().isWallBlock(gridX, gridY - 1)) {
+		if (!map.isWallBlock(gridX, gridY - 1)) {
 			dirs.add(Direction.UP);
 		}
 		
-		if (!this.game.getMap().isWallBlock(gridX, gridY + 1)) {
+		if (!map.isWallBlock(gridX, gridY + 1)) {
 			dirs.add(Direction.DOWN);
 		}
 		
-		if (!this.game.getMap().isWallBlock(gridX - 1, gridY)) {
+		if (!map.isWallBlock(gridX - 1, gridY)) {
 			dirs.add(Direction.LEFT);
 		}
 		
-		if (!this.game.getMap().isWallBlock(gridX + 1, gridY)) {
+		if (!map.isWallBlock(gridX + 1, gridY)) {
 			dirs.add(Direction.RIGHT);
 		}
 		
 		return dirs.toArray(new Direction[dirs.size()]);
 	}
 	
-	private int getShortestDistance(int gridX, int gridY) {
-		int intersecDist = this.getDistanceToNextIntersection(gridX, gridY);
-		int wallDist = this.getDistanceToNextWall(gridX, gridY);
+	private int getShortestDistance(Map map, int gridX, int gridY) {
+		int intersecDist = this.getDistanceToNextIntersection(map, gridX, gridY);
+		int wallDist = this.getDistanceToNextWall(map, gridX, gridY);
 		
 //		System.out.println("intersec: " + intersecDist + " | wall: " + wallDist);
 		
@@ -90,13 +96,13 @@ public class LivingEntity extends Entity {
 		}
 	}
 	
-	private int getDistanceToNextIntersection(int gridX, int gridY) {
+	private int getDistanceToNextIntersection(Map map, int gridX, int gridY) {
 		int distance = 0;
 		
 		switch (this.direction) {
 			case DOWN:
-				for (int i = gridY + 1; i < this.game.getMap().getHeight(); i++) {
-					if (this.getFreeDirections(gridX, i).length > 2) {
+				for (int i = gridY + 1; i < map.getHeight(); i++) {
+					if (this.getFreeDirectionsInGrid(map, gridX, i).length > 2) {
 						distance = i - gridY;
 						break;
 					}
@@ -105,7 +111,7 @@ public class LivingEntity extends Entity {
 				break;
 			case UP:
 				for (int i = gridY - 1; i >= 0; i--) {
-					if (this.getFreeDirections(gridX, i).length > 2) {
+					if (this.getFreeDirectionsInGrid(map, gridX, i).length > 2) {
 						distance = gridY - i;
 						break;
 					}
@@ -114,8 +120,8 @@ public class LivingEntity extends Entity {
 				break;
 			
 			case RIGHT:
-				for (int i = gridX + 1; i < this.game.getMap().getWidth(); i++) {
-					if (this.getFreeDirections(i, gridY).length > 2) {
+				for (int i = gridX + 1; i < map.getWidth(); i++) {
+					if (this.getFreeDirectionsInGrid(map, i, gridY).length > 2) {
 						distance = i - gridX;
 						break;
 					}
@@ -124,7 +130,7 @@ public class LivingEntity extends Entity {
 				break;
 			case LEFT:
 				for (int i = gridX - 1; i >= 0; i--) {
-					if (this.getFreeDirections(i, gridY).length > 2) {
+					if (this.getFreeDirectionsInGrid(map, i, gridY).length > 2) {
 						distance = gridX - i;
 						break;
 					}
@@ -136,13 +142,13 @@ public class LivingEntity extends Entity {
 		return distance;
 	}
 	
-	private int getDistanceToNextWall(int gridX, int gridY) {
+	private int getDistanceToNextWall(Map map, int gridX, int gridY) {
 		int distance = 0;
 		
 		switch (this.direction) {
 			case DOWN:
-				for (int i = gridY; i < this.game.getMap().getHeight(); i++) {
-					if (this.game.getMap().isWallBlock(gridX, i)) {
+				for (int i = gridY; i < map.getHeight(); i++) {
+					if (map.isWallBlock(gridX, i)) {
 						distance = i - gridY - 1;
 						break;
 					}
@@ -151,7 +157,7 @@ public class LivingEntity extends Entity {
 				break;
 			case UP:
 				for (int i = gridY; i >= 0; i--) {
-					if (this.game.getMap().isWallBlock(gridX, i)) {
+					if (map.isWallBlock(gridX, i)) {
 						distance = gridY - i - 1;
 						break;
 					}
@@ -160,8 +166,8 @@ public class LivingEntity extends Entity {
 				break;
 			
 			case RIGHT:
-				for (int i = gridX; i < this.game.getMap().getWidth(); i++) {
-					if (this.game.getMap().isWallBlock(i, gridY)) {
+				for (int i = gridX; i < map.getWidth(); i++) {
+					if (map.isWallBlock(i, gridY)) {
 						distance = i - gridX - 1;
 						break;
 					}
@@ -170,7 +176,7 @@ public class LivingEntity extends Entity {
 				break;
 			case LEFT:
 				for (int i = gridX; i >= 0; i--) {
-					if (this.game.getMap().isWallBlock(i, gridY)) {
+					if (map.isWallBlock(i, gridY)) {
 						distance = gridX - i - 1;
 						break;
 					}
@@ -183,7 +189,8 @@ public class LivingEntity extends Entity {
 	}
 	
 	protected void updateMovement() {
-		this.moveToGridPosition(this.desiredGridX, this.desiredGridY);
+		if (this.game.getGameState() == GameState.IN_GAME || this.game.getGameState() == GameState.POWERUP_ACTIVE)
+			this.moveToGridPosition(this.desiredGridX, this.desiredGridY);
 	}
 	
 	/**

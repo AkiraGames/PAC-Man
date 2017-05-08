@@ -10,8 +10,11 @@ import de.akiragames.pacman.utils.Utils;
 public class Game {
 	
 	private String gameId;
-	private int gameScore, gameStart;
+	private int gameScore, gameStart, gameEnd;
 	private int lives, ghostsEaten, powerUpsEaten;
+	
+	// Temporäre Variable
+	private int temp;
 	
 	private Screen screen;
 	private GameState gameState;
@@ -27,7 +30,9 @@ public class Game {
 		this.ghostsEaten = 0;
 		this.powerUpsEaten = 0;
 		
-		this.gameState = GameState.LOADING_SCREEN;
+		this.temp = 5;
+		
+		this.gameState = GameState.START_GAME;
 		this.screen = screen;
 		
 		this.map = new Map(this);
@@ -35,15 +40,32 @@ public class Game {
 	
 	// Methode, wenn PacMan stirbt
 	public void die() {
-		if (this.lives > 1) {
+		this.temp = Utils.unixTime();
+		
+		if (this.lives > 0) {
+			this.gameState = GameState.DEATH;
+			this.map.deathReset();
+			
 			this.lives--;
 		} else {
 			this.gameOver();
 		}
 	}
 	
-	private void gameOver() {
+	// Spiel vorbei: gewonnen
+	public void victory() {
+		this.gameState = GameState.VICTORY;
 		
+		this.temp = Utils.unixTime();
+		
+		this.gameEnd = Utils.unixTime();
+	}
+	
+	// Spiel vorbei: verloren
+	public void gameOver() {
+		this.gameState = GameState.GAME_OVER;
+		
+		this.gameEnd = Utils.unixTime();
 	}
 	
 	// Score um "points" erhöhen
@@ -52,8 +74,8 @@ public class Game {
 	}
 	
 	// Methode zum Speichern des Scores
-	public void saveToDatabase(String playerName, double avergaeFPS) {
-		int duration = Utils.unixTime() - this.gameStart;
+	public void saveToDatabase(String playerName) {
+		int duration = this.gameEnd - this.gameStart;
 		
 		String urlString = Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/addscore.php?gameId=" + this.gameId + "&gameVersion=" + Main.VERSION + "&playerName=" + playerName + "&gameScore=" + this.gameScore + "&gameStart=" + this.gameStart + "&gameDuration=" + duration + "&livesLeft=" + this.getLives() + "&ghostsEaten=" + this.getGhostsEaten();
 		
@@ -70,17 +92,93 @@ public class Game {
 	
 	public void update() {
 		this.map.update();
+		
+		if (this.gameState == GameState.START_GAME) {
+			if (this.temp > 0 ) {
+				this.temp = 5 - (Utils.unixTime() - this.gameStart);
+			} else {
+				this.gameStart = Utils.unixTime();
+				this.gameState = GameState.IN_GAME;
+			}
+		} else if (this.gameState == GameState.DEATH) {
+			if (Utils.unixTime() - this.temp == 3)
+				this.gameState = GameState.IN_GAME;
+		} else if (this.gameState == GameState.GAME_OVER) {
+			if (Utils.unixTime() - this.temp == 3)
+				this.gameState = GameState.ENTER_NAME;
+		} else if (this.gameState == GameState.VICTORY) {
+			if (Utils.unixTime() - this.temp == 3)
+				this.gameState = GameState.ENTER_NAME;
+		} else if (this.gameState == GameState.POWERUP_ACTIVE) {
+			if (Utils.unixTime() - this.temp == 20)
+				this.gameState = GameState.IN_GAME;
+		}
 	}
 	
 	public void render() {
-		this.map.render();
-		this.renderInformation();
+		if (this.gameState == GameState.ENTER_NAME) {
+			this.screen.clearFull();
+			
+			// Namen eingeben und Spiel wird in Datenbank gespeichert.
+		} else {
+			this.map.render();
+			
+			if (this.gameState == GameState.START_GAME) {
+				this.renderStartText();
+			} else if (this.gameState == GameState.DEATH) {
+				this.renderDeathText();
+			} else if (this.gameState == GameState.GAME_OVER) {
+				this.renderGameOver();
+			} else if (this.gameState == GameState.VICTORY) {
+				this.renderVictoryText();
+			} else {
+				this.renderInformation();
+			}
+		}
+	}
+	
+	private void renderDeathText() {
+		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
+		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
+		this.screen.renderText("You Died!", 240, 360, 30, Color.RED);
+	}
+	
+	private void renderGameOver() {
+		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
+		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
+		this.screen.renderText("Game Over!", 225, 360, 30, Color.RED);
+	}
+	
+	private void renderVictoryText() {
+		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
+		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
+		this.screen.renderText("Victory!", 240, 360, 30, Color.RED);
+	}
+	
+	private void renderStartText() {		
+		this.screen.renderText("Ready? | Start in " + this.temp + "...", 155, 360, 30, Color.RED);
 	}
 	
 	private void renderInformation() {
 		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
 		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
 		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 260, 360, 30, Color.WHITE);
+	}
+	
+	public void activatePowerUp() {
+		this.powerUpsEaten++;
+		
+		this.temp = Utils.unixTime();
+		this.gameState = GameState.POWERUP_ACTIVE;
+	}
+	
+	public void setGameState(GameState state) {
+		this.gameState = state;
+	}
+	
+	public void eatGhost() {
+		this.ghostsEaten++;
+		this.scoreUp(50);
 	}
 	
 	///////////////////////////////////////////////

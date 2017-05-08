@@ -3,7 +3,9 @@ package de.akiragames.pacman.game;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
+import de.akiragames.pacman.entity.Ghost;
 import de.akiragames.pacman.entity.PacDot;
 import de.akiragames.pacman.entity.PacMan;
 import de.akiragames.pacman.entity.PowerUp;
@@ -18,11 +20,12 @@ public class Map {
 	
 	private PacMan pacman;
 	
-	private CollisionChecker collisionChecker;
+	private CollisionChecker[] collisionCheckers;
 	
 	private WallBlock[] wallBlocks;
 	private PowerUp[] powerUps;
 	private PacDot[] pacDots;
+	private Ghost[] ghosts;
 	
 	public Map(Game game) {
 		BufferedImage[] images = FileUtils.loadImages(new String[]{"map/pattern.png", "map/labyrinth.png"});
@@ -43,17 +46,22 @@ public class Map {
 		
 		this.scanWallBlocks();
 		
-		this.collisionChecker = new CollisionChecker(this.pacman, this.pacDots);
-		this.collisionChecker.addEntities(this.powerUps);
+		this.ghosts = this.loadGhosts();
+		
+		this.collisionCheckers = this.loadCollisionCheckers();
 		
 		this.renderWalls();
 	}
 	
 	public void update() {
-		this.collisionChecker.check();
+		// CollisionCheckers
+		for (int i = 0; i < this.collisionCheckers.length; i++) {
+			this.collisionCheckers[i].check();
+		}
 		
 		int gameProgress = 0;
 		
+		// PowerUps
 		for (int i = 0; i < this.powerUps.length; i++) {
 			this.powerUps[i].update();
 			
@@ -61,6 +69,7 @@ public class Map {
 				gameProgress++;
 		}
 		
+		// PacDots
 		for (int i = 0; i < this.pacDots.length; i++) {
 			this.pacDots[i].update();
 			
@@ -69,13 +78,35 @@ public class Map {
 		}
 		
 		if (gameProgress >= this.powerUps.length + this.pacDots.length) {
-			// Game ist erfolgreich beendet.
+			this.game.victory();
 		}
 		
+		// Ghosts
+		for (int i = 0; i < this.ghosts.length; i++) {
+			this.ghosts[i].update();
+			
+			if (this.ghosts[i].isCollidingPacMan()) {
+				if (this.game.getGameState() == GameState.IN_GAME) {
+					if (!this.ghosts[i].isEaten()) this.game.die();
+				} else if (this.game.getGameState() == GameState.POWERUP_ACTIVE) {
+					this.ghosts[i].vanish();
+					this.game.eatGhost();
+				}
+			}
+		}
+		
+		// PacMan
 		this.pacman.update();
 	}
 	
-	public void render() {	
+	public void deathReset() {
+		this.pacman = this.loadPacMan();
+		this.ghosts = this.loadGhosts();
+		
+		this.collisionCheckers = this.loadCollisionCheckers();
+	}
+	
+	public void render() {
 		// PacDots
 		for (int i = 0; i < this.pacDots.length; i++) {
 			this.pacDots[i].render();
@@ -86,11 +117,20 @@ public class Map {
 			this.powerUps[i].render();
 		}
 		
+		// Ghosts
+		for (int i = 0; i < this.ghosts.length; i++) {
+			int a = this.ghosts[i].getId();
+			
+			if (this.game.getGameState() == GameState.POWERUP_ACTIVE) a = 0;
+			
+			if (!this.ghosts[i].isEaten()) this.ghosts[i].render(a);
+		}
+		
 		// PacMan
 		this.pacman.renderAnimation();
 	}
 	
-	private void renderWalls() {
+	public void renderWalls() {
 		int[] pixels = this.getGame().getScreen().getPixels();
 		
 		for (int y = 0; y < this.height * 32; y++) {
@@ -116,7 +156,7 @@ public class Map {
 		
 		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
+				for (int x = 0; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
 						if (pixels[x + y * this.pattern.getWidth()] == Color.RED.getRGB()) {
 							pm = new PacMan(x, y, this.game);
@@ -154,7 +194,7 @@ public class Map {
 		
 		for (int y = 0; y < this.pattern.getHeight(); y++) {
 			if (y >= 0 && y < this.game.getScreen().getHeight()) {
-				for (int x = 0 * 32; x < this.pattern.getWidth(); x++) {
+				for (int x = 0; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
 						if (pixels[x + y * this.pattern.getWidth()] == Color.BLACK.getRGB())
 							pd.add(new PacDot(x, y, this.game));
@@ -164,6 +204,35 @@ public class Map {
 		}
 		
 		return pd.toArray(new PacDot[pd.size()]);
+	}
+	
+	private Ghost[] loadGhosts() {
+		ArrayList<Ghost> g = new ArrayList<Ghost>();
+		int[] pixels = new int[this.pattern.getWidth() * this.pattern.getHeight()];
+		
+		this.pattern.getRGB(0, 0, this.pattern.getWidth(), this.pattern.getHeight(), pixels, 0, this.pattern.getWidth());
+		
+		int ghostCount = 0;
+		
+		for (int y = 0; y < this.pattern.getHeight(); y++) {
+			if (y >= 0 && y < this.game.getScreen().getHeight()) {
+				for (int x = 0; x < this.pattern.getWidth(); x++) {
+					if (x >= 0 && x < this.game.getScreen().getWidth()) {
+						if (pixels[x + y * this.pattern.getWidth()] == Color.WHITE.getRGB()) {
+							Ghost ghost = new Ghost(x, y, this.game, ghostCount + 1);
+							Direction[] freeDirections = ghost.getFreeDirections(this);
+							
+							ghost.changeDirection(this, freeDirections[new Random().nextInt(freeDirections.length)]);
+							
+							g.add(ghost);
+							ghostCount++;
+						}
+					}
+				}
+			}
+		}
+		
+		return g.toArray(new Ghost[g.size()]);
 	}
 	
 	private PowerUp[] loadPowerUps() {
@@ -206,6 +275,25 @@ public class Map {
 		return blocks.toArray(new WallBlock[blocks.size()]);
 	}
 	
+	private CollisionChecker[] loadCollisionCheckers() {
+		ArrayList<CollisionChecker> checkers = new ArrayList<CollisionChecker>();
+		
+		// PacMan-CollisionChecker
+		CollisionChecker pacChecker = new CollisionChecker(this.pacman, this.pacDots);
+		pacChecker.addEntities(this.powerUps);
+		pacChecker.addEntities(this.ghosts);
+		checkers.add(pacChecker);
+		
+//		for (int i = 0; i < this.ghosts.length; i++) {
+//			CollisionChecker cc = new CollisionChecker(this.ghosts[i], this.ghosts);
+//			
+//			cc.removeEntity(this.ghosts[i]);
+//			checkers.add(cc);
+//		}
+		
+		return checkers.toArray(new CollisionChecker[checkers.size()]);
+	}
+	
 	/////////////////////////////////////////////////
 	
 	public BufferedImage getPattern() {
@@ -241,8 +329,12 @@ public class Map {
 		return this.pacDots;
 	}
 	
-	public CollisionChecker getCollisionChecker() {
-		return this.collisionChecker;
+	public Ghost[] getGhosts() {
+		return this.ghosts;
+	}
+	
+	public CollisionChecker[] getCollisionCheckers() {
+		return this.collisionCheckers;
 	}
 	
 	public int getWidth() {

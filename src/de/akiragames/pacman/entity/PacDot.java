@@ -13,7 +13,7 @@ public class PacDot extends Entity {
 	}
 	
 	public void update() {
-		if (this.game.getMap().getCollisionChecker().isCollidingWithPacMan(this) && !this.pacManCollision) {
+		if (this.game.getMap().getCollisionCheckers()[0].isCollidingWithPacMan(this) && !this.pacManCollision) {
 			this.pacManCollision = true;
 			
 			this.game.scoreUp(10);
