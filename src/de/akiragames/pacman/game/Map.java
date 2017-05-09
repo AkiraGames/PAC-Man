@@ -77,7 +77,7 @@ public class Map {
 				gameProgress++;
 		}
 		
-		if (gameProgress >= this.powerUps.length + this.pacDots.length) {
+		if (this.game.getGameState() == GameState.IN_GAME && gameProgress >= this.powerUps.length + this.pacDots.length) {
 			this.game.victory();
 		}
 		
@@ -85,9 +85,9 @@ public class Map {
 		for (int i = 0; i < this.ghosts.length; i++) {
 			this.ghosts[i].update();
 			
-			if (this.ghosts[i].isCollidingPacMan()) {
+			if (this.ghosts[i].isCollidingPacMan() && !this.ghosts[i].isEaten()) {
 				if (this.game.getGameState() == GameState.IN_GAME) {
-					if (!this.ghosts[i].isEaten()) this.game.die();
+					this.game.die();
 				} else if (this.game.getGameState() == GameState.POWERUP_ACTIVE) {
 					this.ghosts[i].vanish();
 					this.game.eatGhost();

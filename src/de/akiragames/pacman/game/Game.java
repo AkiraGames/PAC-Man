@@ -110,7 +110,7 @@ public class Game {
 			if (Utils.unixTime() - this.temp == 3)
 				this.gameState = GameState.ENTER_NAME;
 		} else if (this.gameState == GameState.POWERUP_ACTIVE) {
-			if (Utils.unixTime() - this.temp == 20)
+			if (Utils.unixTime() - this.temp == 7)
 				this.gameState = GameState.IN_GAME;
 		}
 	}
@@ -162,7 +162,7 @@ public class Game {
 	private void renderInformation() {
 		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
 		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
-		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 260, 360, 30, Color.WHITE);
+		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 260, 360, 30, this.gameState == GameState.IN_GAME ? Color.WHITE : Color.CYAN);
 	}
 	
 	public void activatePowerUp() {
