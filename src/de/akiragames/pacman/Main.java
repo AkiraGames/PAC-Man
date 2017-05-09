@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 
@@ -21,7 +20,7 @@ public class Main extends Canvas implements Runnable {
 	// Projekt-Parameter
 	public static final String NAME = "Project PAC-Man";
 	public static final String GAME_ID_REF = "PAC";
-	public static final String VERSION = "inDev";
+	public static final String VERSION = "1.0";
 
 	// Fenster-Parameter
 	public static final int WIDTH = 20 * 32;
@@ -35,8 +34,6 @@ public class Main extends Canvas implements Runnable {
 	private Thread thread;
 	private JFrame frame;
 	private boolean running = false;
-	
-	private HashMap<Integer, Integer> fpsList;
 	
 	// Input-Manager
 	private static Keyboard keyboard;
@@ -57,7 +54,6 @@ public class Main extends Canvas implements Runnable {
 		this.frame = new JFrame();
 		
 		this.game = new Game(this.screen);
-		this.fpsList = new HashMap<Integer, Integer>();
 		
 		Main.keyboard = new Keyboard(this);
 		
@@ -133,8 +129,6 @@ public class Main extends Canvas implements Runnable {
 				
 				this.frame.setTitle(NAME + " " + VERSION + " [ " + updates + " ups | " + frames + " fps ]");
 				
-				this.fpsList.put(this.fpsList.size(), frames);
-				
 				updates = 0;
 				frames = 0;
 			}
@@ -155,7 +149,6 @@ public class Main extends Canvas implements Runnable {
 			return;
 		}
 		
-		this.screen.clearKeepWalls();
 		this.game.render();
 		
 		for (int i = 0; i < this.pixels.length; i++) {
@@ -186,14 +179,8 @@ public class Main extends Canvas implements Runnable {
 		return this.game;
 	}
 	
-	public double getAverageFPS() {
-		double sum = 0.0D;
-		
-		for (int i = 0; i < this.fpsList.size(); i++) {
-			sum += this.fpsList.get(i);
-		}
-		
-		return Math.round((double) sum / this.fpsList.size()) / 100.0;
+	public JFrame getFrame() {
+		return this.frame;
 	}
 
 }

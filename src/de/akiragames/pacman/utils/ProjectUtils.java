@@ -35,6 +35,8 @@ public class ProjectUtils {
 				
 				System.err.println("A new version of this application has been released on " + Utils.formatTime(timestamp) + ": " + Main.NAME + " " + newVersion);
 				System.err.println("Download latest version on " + Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/");
+				
+				
 			} else {
 				System.out.println("Application is up to date.");
 			}

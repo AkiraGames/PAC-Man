@@ -13,6 +13,8 @@ public class Game {
 	private int gameScore, gameStart, gameEnd;
 	private int lives, ghostsEaten, powerUpsEaten;
 	
+	public String playerName;
+	
 	// Temporäre Variable
 	private int temp;
 	
@@ -24,18 +26,28 @@ public class Game {
 	public Game(Screen screen) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
-		this.gameStart = Utils.unixTime();
 		
 		this.lives = 3;
 		this.ghostsEaten = 0;
 		this.powerUpsEaten = 0;
 		
-		this.temp = 5;
-		
-		this.gameState = GameState.START_GAME;
+		this.gameState = GameState.CHECK_UPDATES;
 		this.screen = screen;
 		
+		this.playerName = "PACBOT";
+		
 		this.map = new Map(this);
+	}
+	
+	// Methode, um Spiel zu starten
+	public void start() {
+		this.gameStart = Utils.unixTime();
+		this.gameState = GameState.START_GAME;
+		
+		this.temp = 5;
+		
+		this.screen.clearFull();
+		this.map.renderWalls();
 	}
 	
 	// Methode, wenn PacMan stirbt
@@ -88,10 +100,12 @@ public class Game {
 			System.err.println("Failed to send game data to database (" + e.getMessage() + ")!");
 			System.err.println("Game stats could not be saved!");
 		}
+		
+		this.gameState = GameState.SAVED_TO_DB;
 	}
 	
-	public void update() {
-		this.map.update();
+	public void update() {		
+		if (this.gameState != GameState.CHECK_UPDATES) this.map.update();
 		
 		if (this.gameState == GameState.START_GAME) {
 			if (this.temp > 0 ) {
@@ -103,10 +117,7 @@ public class Game {
 		} else if (this.gameState == GameState.DEATH) {
 			if (Utils.unixTime() - this.temp == 3)
 				this.gameState = GameState.IN_GAME;
-		} else if (this.gameState == GameState.GAME_OVER) {
-			if (Utils.unixTime() - this.temp == 3)
-				this.gameState = GameState.ENTER_NAME;
-		} else if (this.gameState == GameState.VICTORY) {
+		} else if (this.gameState == GameState.GAME_OVER || this.gameState == GameState.VICTORY) {
 			if (Utils.unixTime() - this.temp == 3)
 				this.gameState = GameState.ENTER_NAME;
 		} else if (this.gameState == GameState.POWERUP_ACTIVE) {
@@ -116,11 +127,17 @@ public class Game {
 	}
 	
 	public void render() {
-		if (this.gameState == GameState.ENTER_NAME) {
+		if (this.gameState == GameState.CHECK_UPDATES) {
 			this.screen.clearFull();
-			
-			// Namen eingeben und Spiel wird in Datenbank gespeichert.
+			this.renderCheckUpdatesScreen();
+		} else if (this.gameState == GameState.ENTER_NAME) {
+			this.screen.clearFull();
+			this.renderEndScreen();
+		} else if (this.gameState == GameState.SAVED_TO_DB) {
+			this.screen.clearFull();
+			this.renderRestartScreen();
 		} else {
+			this.screen.clearKeepWalls();
 			this.map.render();
 			
 			if (this.gameState == GameState.START_GAME) {
@@ -135,6 +152,33 @@ public class Game {
 				this.renderInformation();
 			}
 		}
+	}
+	
+	private void renderCheckUpdatesScreen() {
+		if (Main.newVersion.equalsIgnoreCase(Main.VERSION)) {
+			this.screen.renderText("Game is up to date.", 100, 100, 30, Color.GREEN);
+			this.screen.renderText("Press Enter to continue.", 100, 170, 30, Color.CYAN);
+		} else {
+			this.screen.renderText("A new game version", 100, 100, 30, Color.RED);
+			this.screen.renderText("(" + Main.newVersion + ") is available!", 100, 140, 30, Color.RED);
+			this.screen.renderText("Go on 'akiragames.cynfos.de/PAC/' to download.", 100, 180, 15, Color.RED);
+			this.screen.renderText("Press Enter to continue.", 100, 250, 30, Color.CYAN);
+		}
+	}
+	
+	private void renderRestartScreen() {
+		this.screen.renderText("Game has been saved if", 100, 100, 30, Color.CYAN);
+		this.screen.renderText("connected to the internet.", 100, 140, 30, Color.CYAN);
+		this.screen.renderText("Close window to quit game.", 100, 210, 30, Color.CYAN);
+	}
+	
+	private void renderEndScreen() {
+		this.screen.renderText("Please Enter Your Name:", 100, 100, 30, Color.CYAN);
+		this.screen.renderText(">> ", 100, 150, 30, Color.CYAN);
+		this.screen.renderText(this.playerName, 150, 150, 30, Color.YELLOW);
+		this.screen.renderText("Press Enter to save your", 100, 220, 30, Color.CYAN);
+		this.screen.renderText("game.", 100, 260, 30, Color.CYAN);
+		this.screen.renderText("ID: " + this.gameId, 340, 260, 30, Color.WHITE);
 	}
 	
 	private void renderDeathText() {

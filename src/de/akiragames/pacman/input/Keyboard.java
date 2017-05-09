@@ -11,6 +11,8 @@ public class Keyboard implements KeyListener {
 	
 	private boolean[] keys = new boolean[65536];
 	
+	private String alpha = "0123456789abcdefghijklmnopqrstuvwxyz";
+	
 	private Main main;
 	
 	public Keyboard(Main main) {
@@ -28,6 +30,28 @@ public class Keyboard implements KeyListener {
 		if (!keys[keyCode]) {
 			if (keyCode == KeyEvent.VK_F1) {
 				this.main.getGame().getScreen().saveScreenshot();
+			}
+			
+			if (this.main.getGame().getGameState() == GameState.CHECK_UPDATES && keyCode == KeyEvent.VK_ENTER) {
+				this.main.getGame().start();
+			}
+			
+			if (this.main.getGame().getGameState() == GameState.ENTER_NAME) {
+				if (keyCode == KeyEvent.VK_ENTER) {
+					this.main.getGame().saveToDatabase(this.main.getGame().playerName);
+				} else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+					if (this.main.getGame().playerName.length() > 0)
+						this.main.getGame().playerName = this.main.getGame().playerName.substring(0, this.main.getGame().playerName.length() - 1);
+				} else {
+					String key = String.valueOf(e.getKeyChar());
+					
+					if (this.alpha.indexOf(key) < 0) key = "";
+					
+					key = key.toUpperCase();
+					
+					if (this.main.getGame().playerName.length() < 16)
+						this.main.getGame().playerName += key;
+				}
 			}
 		}
 		

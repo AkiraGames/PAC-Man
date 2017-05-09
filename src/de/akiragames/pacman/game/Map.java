@@ -49,8 +49,6 @@ public class Map {
 		this.ghosts = this.loadGhosts();
 		
 		this.collisionCheckers = this.loadCollisionCheckers();
-		
-		this.renderWalls();
 	}
 	
 	public void update() {
@@ -77,7 +75,7 @@ public class Map {
 				gameProgress++;
 		}
 		
-		if (this.game.getGameState() == GameState.IN_GAME && gameProgress >= this.powerUps.length + this.pacDots.length) {
+		if ((this.game.getGameState() == GameState.IN_GAME || this.game.getGameState() == GameState.POWERUP_ACTIVE) && gameProgress >= this.powerUps.length + this.pacDots.length) {
 			this.game.victory();
 		}
 		
