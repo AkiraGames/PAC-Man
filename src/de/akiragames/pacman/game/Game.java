@@ -10,13 +10,15 @@ import de.akiragames.pacman.utils.Utils;
 public class Game {
 	
 	private String gameId;
-	private int gameScore, gameStart, gameEnd;
+	private int gameScore, gameLevel, gameStart, gameEnd;
 	private int lives, ghostsEaten, powerUpsEaten;
 	
 	public String playerName;
 	
-	// Temporäre Variable
-	private int temp;
+	// Temporäre Variablen
+	private int temp, anim, counter;
+	
+	private int textSize = 25;
 	
 	private Screen screen;
 	private GameState gameState;
@@ -26,10 +28,14 @@ public class Game {
 	public Game(Screen screen) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
+		this.gameLevel = 1;
 		
 		this.lives = 3;
 		this.ghostsEaten = 0;
 		this.powerUpsEaten = 0;
+		
+		this.anim = 0;
+		this.counter = 0;
 		
 		this.gameState = GameState.CHECK_UPDATES;
 		this.screen = screen;
@@ -64,13 +70,22 @@ public class Game {
 		}
 	}
 	
-	// Spiel vorbei: gewonnen
-	public void victory() {
-		this.gameState = GameState.VICTORY;
-		
+	// Level bestanden
+	public void passedLevel() {
+		this.gameState = GameState.LEVEL_PASSED;
 		this.temp = Utils.unixTime();
 		
-		this.gameEnd = Utils.unixTime();
+		this.scoreUp(75); // 75 Punkte für Levelaufstieg
+		
+		if (this.lives > 0) this.lives--;
+		
+		this.map = new Map(this);
+	}
+	
+	// Nächsten Level betreten
+	public void nextLevel() {
+		this.gameState = GameState.IN_GAME;
+		this.gameLevel++;
 	}
 	
 	// Spiel vorbei: verloren
@@ -89,7 +104,7 @@ public class Game {
 	public void saveToDatabase(String playerName) {
 		int duration = this.gameEnd - this.gameStart;
 		
-		String urlString = Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/addscore.php?gameId=" + this.gameId + "&gameVersion=" + Main.VERSION + "&playerName=" + playerName + "&gameScore=" + this.gameScore + "&gameStart=" + this.gameStart + "&gameDuration=" + duration + "&livesLeft=" + this.getLives() + "&ghostsEaten=" + this.getGhostsEaten();
+		String urlString = Utils.websiteDomain + "/" + Main.GAME_ID_REF + "/addscore.php?gameId=" + this.gameId + "&gameVersion=" + Main.VERSION + "&playerName=" + playerName + "&gameScore=" + this.gameScore + "&reachedLevel=" + this.gameLevel + "&gameStart=" + this.gameStart + "&gameDuration=" + duration + "&ghostsEaten=" + this.getGhostsEaten();
 		
 		try {
 			System.out.println("Sending game data to database...");
@@ -105,7 +120,7 @@ public class Game {
 	}
 	
 	public void update() {		
-		if (this.gameState != GameState.CHECK_UPDATES) this.map.update();
+		if (this.gameState != GameState.CHECK_UPDATES && this.gameState != GameState.LEVEL_PASSED) this.map.update();
 		
 		if (this.gameState == GameState.START_GAME) {
 			if (this.temp > 0 ) {
@@ -117,9 +132,16 @@ public class Game {
 		} else if (this.gameState == GameState.DEATH) {
 			if (Utils.unixTime() - this.temp == 3)
 				this.gameState = GameState.IN_GAME;
-		} else if (this.gameState == GameState.GAME_OVER || this.gameState == GameState.VICTORY) {
+		} else if (this.gameState == GameState.GAME_OVER) {
 			if (Utils.unixTime() - this.temp == 3)
 				this.gameState = GameState.ENTER_NAME;
+		} else if (this.gameState == GameState.LEVEL_PASSED) {
+			if (Utils.unixTime() - this.temp == 3)
+				this.nextLevel();
+		} else if (this.gameState == GameState.ENTER_NAME) {
+			this.counter++;
+			
+			if (this.counter % 8 == 0) this.anim++;
 		} else if (this.gameState == GameState.POWERUP_ACTIVE) {
 			if (Utils.unixTime() - this.temp == 7)
 				this.gameState = GameState.IN_GAME;
@@ -146,8 +168,8 @@ public class Game {
 				this.renderDeathText();
 			} else if (this.gameState == GameState.GAME_OVER) {
 				this.renderGameOver();
-			} else if (this.gameState == GameState.VICTORY) {
-				this.renderVictoryText();
+			} else if (this.gameState == GameState.LEVEL_PASSED) {
+				this.renderNextLevelText();
 			} else {
 				this.renderInformation();
 			}
@@ -173,40 +195,44 @@ public class Game {
 	}
 	
 	private void renderEndScreen() {
+		int nameLength = this.screen.getStringPixelLength(this.playerName, 30);
+		
 		this.screen.renderText("Please Enter Your Name:", 100, 100, 30, Color.CYAN);
 		this.screen.renderText(">> ", 100, 150, 30, Color.CYAN);
 		this.screen.renderText(this.playerName, 150, 150, 30, Color.YELLOW);
+		if (this.anim % 4 < 2) this.screen.renderText("|", 152 + nameLength, 145, 40, Color.CYAN);
 		this.screen.renderText("Press Enter to save your", 100, 220, 30, Color.CYAN);
 		this.screen.renderText("game.", 100, 260, 30, Color.CYAN);
 		this.screen.renderText("ID: " + this.gameId, 340, 260, 30, Color.WHITE);
 	}
 	
 	private void renderDeathText() {
-		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
-		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
-		this.screen.renderText("You Died!", 240, 360, 30, Color.RED);
+		this.renderCenterText();
+		this.screen.renderText("You Died!", 240, 360, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderGameOver() {
-		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
-		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
-		this.screen.renderText("Game Over!", 225, 360, 30, Color.RED);
+		this.renderCenterText();
+		this.screen.renderText("Game Over!", 225, 360, this.textSize + 5, Color.RED);
 	}
 	
-	private void renderVictoryText() {
-		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
-		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
-		this.screen.renderText("Victory!", 240, 360, 30, Color.RED);
+	private void renderNextLevelText() {
+		this.screen.renderText("You passed Level " + this.gameLevel + "!", 155, 360, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderStartText() {		
-		this.screen.renderText("Ready? | Start in " + this.temp + "...", 155, 360, 30, Color.RED);
+		this.screen.renderText("Ready? | Start in " + this.temp + "...", 155, 360, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderInformation() {
-		this.screen.renderText("Score: " + this.gameScore, 10, 360, 30, Color.WHITE);
-		this.screen.renderText("Lives: " + this.lives, 500, 360, 30, Color.WHITE);
-		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 260, 360, 30, this.gameState == GameState.IN_GAME ? Color.WHITE : Color.CYAN);
+		this.renderCenterText();
+		this.screen.renderText("Level: " + this.gameLevel, 195, 360, this.textSize, Color.WHITE);
+		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 350, 360, this.textSize, this.gameState == GameState.IN_GAME ? Color.WHITE : Color.CYAN);
+	}
+	
+	private void renderCenterText() {
+		this.screen.renderText("Score: " + this.gameScore, 20, 360, this.textSize, Color.WHITE);
+		this.screen.renderText("Lives: " + this.lives, 525, 360, this.textSize, Color.WHITE);
 	}
 	
 	public void activatePowerUp() {
@@ -226,6 +252,10 @@ public class Game {
 	}
 	
 	///////////////////////////////////////////////
+	
+	public int getLevel() {
+		return this.gameLevel;
+	}
 	
 	public int getScore() {
 		return this.gameScore;

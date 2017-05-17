@@ -75,8 +75,8 @@ public class Map {
 				gameProgress++;
 		}
 		
-		if ((this.game.getGameState() == GameState.IN_GAME || this.game.getGameState() == GameState.POWERUP_ACTIVE) && gameProgress >= this.powerUps.length + this.pacDots.length) {
-			this.game.victory();
+		if ((this.game.getGameState() == GameState.IN_GAME || this.game.getGameState() == GameState.POWERUP_ACTIVE) && gameProgress >= this.pacDots.length + this.powerUps.length) {
+			this.game.passedLevel();
 		}
 		
 		// Ghosts

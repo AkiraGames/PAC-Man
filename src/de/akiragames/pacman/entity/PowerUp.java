@@ -11,6 +11,9 @@ public class PowerUp extends Entity {
 		super(gridX, gridY, game, new String[]{"map/powerup.png"}, true);
 		
 		this.pacManCollision = false;
+		
+		this.anim = 0;
+		this.counter = 0;
 	}
 	
 	public void render() {

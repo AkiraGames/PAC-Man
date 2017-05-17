@@ -106,6 +106,25 @@ public class Screen {
 	}
 	
 	/**
+	 * 
+	 * Gibt die schriftartabhängige Länge eines Textes zurück
+	 */
+	public int getStringPixelLength(String text, int fontSize) {
+		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
+		Graphics graphics = image.getGraphics();
+		
+		int length = 0;
+		
+		graphics.setFont(new Font("Arial", Font.BOLD, fontSize));
+		
+		length = graphics.getFontMetrics().stringWidth(text);
+		
+		graphics.dispose();
+		
+		return length;
+	}
+	
+	/**
 	 * Speichert einen Screenshot.
 	 */
 	public void saveScreenshot() {
