@@ -3,7 +3,9 @@ package de.akiragames.pacman.game;
 import java.awt.Color;
 
 import de.akiragames.pacman.Main;
+import de.akiragames.pacman.entity.PacMan;
 import de.akiragames.pacman.graphics.Screen;
+import de.akiragames.pacman.utils.FileUtils;
 import de.akiragames.pacman.utils.ProjectUtils;
 import de.akiragames.pacman.utils.Utils;
 
@@ -12,6 +14,8 @@ public class Game {
 	private String gameId;
 	private int gameScore, gameLevel, gameStart, gameEnd;
 	private int lives, ghostsEaten, powerUpsEaten;
+	
+	private PacMan dummy;
 	
 	public String playerName;
 	
@@ -42,6 +46,7 @@ public class Game {
 		
 		this.playerName = "PACBOT";
 		
+		this.dummy = new PacMan(-2, 6, this, true);
 		this.map = new Map(this);
 	}
 	
@@ -122,7 +127,13 @@ public class Game {
 	public void update() {		
 		if (this.gameState != GameState.CHECK_UPDATES && this.gameState != GameState.LEVEL_PASSED) this.map.update();
 		
-		if (this.gameState == GameState.START_GAME) {
+		if (this.gameState == GameState.CHECK_UPDATES) {
+			this.counter++;
+			
+			if (this.counter % 8 == 0) this.anim++;
+			
+			this.updateDummy();
+		} else if (this.gameState == GameState.START_GAME) {
 			if (this.temp > 0 ) {
 				this.temp = 5 - (Utils.unixTime() - this.gameStart);
 			} else {
@@ -176,15 +187,32 @@ public class Game {
 		}
 	}
 	
-	private void renderCheckUpdatesScreen() {
-		if (Main.newVersion.equalsIgnoreCase(Main.VERSION)) {
-			this.screen.renderText("Game is up to date.", 100, 100, 30, Color.GREEN);
-			this.screen.renderText("Press Enter to continue.", 100, 170, 30, Color.CYAN);
+	private void updateDummy() {
+		this.dummy.update();
+		
+		if (this.dummy.getDirection() == Direction.RIGHT) {
+			this.dummy.moveToGridPosition(21, 6);
+			
+			if (this.dummy.getGridX() == 21) this.dummy.setDirection(Direction.LEFT);
 		} else {
-			this.screen.renderText("A new game version", 100, 100, 30, Color.RED);
-			this.screen.renderText("(" + Main.newVersion + ") is available!", 100, 140, 30, Color.RED);
-			this.screen.renderText("Go on 'akiragames.cynfos.de/PAC/' to download.", 100, 180, 15, Color.RED);
-			this.screen.renderText("Press Enter to continue.", 100, 250, 30, Color.CYAN);
+			this.dummy.moveToGridPosition(-2, 6);
+			
+			if (this.dummy.getGridX() == -2) this.dummy.setDirection(Direction.RIGHT);
+		}
+	}
+	
+	private void renderCheckUpdatesScreen() {
+		this.screen.renderText("AkiraGames presents", 200, 30, 20, Color.WHITE);
+		this.screen.renderCenteredImage(FileUtils.loadImages(new String[]{"text/title.png"})[0], 60, 1.0);
+		this.dummy.renderAnimation();
+		
+		if (Main.newVersion.equalsIgnoreCase(Main.VERSION)) {
+			this.screen.renderText("Game is up to date.", 210, 250, 20, Color.GREEN);
+			if (this.anim % 5 < 3) this.screen.renderText(">> Press Enter to continue <<", 150, 290, 20, Color.CYAN);
+		} else {
+			this.screen.renderText("A new game version (" + Main.newVersion + ") is available!", 110, 250, 20, Color.RED);
+			this.screen.renderText("Go on 'akiragames.cynfos.de/PAC/' to download.", 110, 280, 15, Color.RED);
+			if (this.anim % 5 < 3) this.screen.renderText(">> Press Enter to continue <<", 150, 320, 20, Color.CYAN);
 		}
 	}
 	

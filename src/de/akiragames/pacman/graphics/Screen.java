@@ -106,6 +106,59 @@ public class Screen {
 	}
 	
 	/**
+	 * Skaliert ein BufferedImage auf die gewünschte Größe.
+	 */
+	private BufferedImage scaleImage(BufferedImage src, int w, int h) {
+		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		int x, y;
+		int ww = src.getWidth();
+		int hh = src.getHeight();
+		
+		for (x = 0; x < w; x++) {
+			for (y = 0; y < h; y++) {
+				int col = src.getRGB(x * ww / w, y * hh / h);
+				img.setRGB(x, y, col);
+			}
+		}
+		
+		return img;
+	}
+	
+	/**
+	 * Rendert ein Bild mit Skalierung.
+	 */
+	public void renderImage(BufferedImage image, int posX, int posY, double scale) {
+		int w = (int) (image.getWidth() * scale);
+		int h = (int) (image.getHeight() * scale);
+		
+		image = this.scaleImage(image, w, h);
+		
+		int[] imagePixels = new int[w * h];
+		
+		image.getRGB(0, 0, w, h, imagePixels, 0, w);
+		
+		for (int y = posY; y < posY + h; y++) {
+			if (y >= 0 && y < this.height) {
+				for (int x = posX; x < posX + w; x++) {
+					if (x >= 0 && x < this.width) {
+						if (imagePixels[(x - posX) + (y - posY) * w] != this.getAlphaColor().getRGB())
+							this.pixels[x + y * this.width] = imagePixels[(x - posX) + (y - posY) * w];
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Rendert ein Bild horizontal zentriert.
+	 */
+	public void renderCenteredImage(BufferedImage image, int posY, double scale) {
+		int w = (int) (image.getWidth() * scale);
+		
+		this.renderImage(image, (this.width - w) / 2, posY, scale);
+	}
+	
+	/**
 	 * 
 	 * Gibt die schriftartabhängige Länge eines Textes zurück
 	 */

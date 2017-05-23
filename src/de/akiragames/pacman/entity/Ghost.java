@@ -15,8 +15,8 @@ public class Ghost extends LivingEntity {
 	
 	private boolean pacManCollision;
 
-	public Ghost(int gridX, int gridY, Game game, int id) {
-		super(gridX, gridY, game, new String[]{"ghost/ghost_1.png", "ghost/ghost_2.png", "ghost/ghost_3.png", "ghost/ghost_4.png", "ghost/ghost_5.png"}, true);
+	public Ghost(int gridX, int gridY, Game game, boolean isDummy, int id) {
+		super(gridX, gridY, game, new String[]{"ghost/ghost_1.png", "ghost/ghost_2.png", "ghost/ghost_3.png", "ghost/ghost_4.png", "ghost/ghost_5.png"}, isDummy, true);
 
 		this.id = id;
 		this.pacManCollision = false;

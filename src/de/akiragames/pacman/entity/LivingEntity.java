@@ -10,16 +10,18 @@ import de.akiragames.pacman.game.Map;
 public class LivingEntity extends Entity {
 	
 	private int speed;
-	private boolean isMovingX, isMovingY;
+	private boolean isMovingX, isMovingY, isDummy;
 	private Direction direction;
 	protected int desiredGridX, desiredGridY;
 	
-	public LivingEntity(int gridX, int gridY, Game game, String[] imageFiles, boolean imagesContainAlphaColor) {
+	public LivingEntity(int gridX, int gridY, Game game, String[] imageFiles, boolean isDummy, boolean imagesContainAlphaColor) {
 		super(gridX, gridY, game, imageFiles, imagesContainAlphaColor);
 		
 		this.speed = 2;
 		this.isMovingX = false;
 		this.isMovingY = false;
+		
+		this.isDummy = isDummy;
 		
 		this.direction = Direction.RIGHT;
 		
@@ -53,6 +55,10 @@ public class LivingEntity extends Entity {
 					break;
 			}
 		}
+	}
+	
+	public void setDirection(Direction direction) {
+		this.direction = direction;
 	}
 	
 	public Direction[] getFreeDirections(Map map) {
@@ -246,6 +252,10 @@ public class LivingEntity extends Entity {
 	
 	public boolean isMoving() {
 		return this.isMovingX || this.isMovingY;
+	}
+	
+	public boolean isDummy() {
+		return this.isDummy;
 	}
 
 }

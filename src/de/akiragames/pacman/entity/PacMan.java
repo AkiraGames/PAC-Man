@@ -15,13 +15,13 @@ public class PacMan extends LivingEntity {
 	private BufferedImage[] imagesDown;
 	private BufferedImage[] imagesLeft;
 
-	public PacMan(int gridX, int gridY, Game game) {
+	public PacMan(int gridX, int gridY, Game game, boolean isDummy) {
 		super(gridX, gridY, game, new String[]{
 				"pacman/pacman_1.png", "pacman/pacman_2.png", "pacman/pacman_3.png", 
 				"pacman/pacman_4.png", "pacman/pacman_5.png", "pacman/pacman_6.png", 
 				"pacman/pacman_7.png", "pacman/pacman_8.png", "pacman/pacman_9.png", 
 				"pacman/pacman_10.png", "pacman/pacman_11.png", "pacman/pacman_12.png", 
-				"pacman/pacman_13.png"}, true);
+				"pacman/pacman_13.png"}, isDummy, true);
 		
 		this.counter = 0;
 		this.anim = 2;
@@ -39,7 +39,7 @@ public class PacMan extends LivingEntity {
 	}
 
 	public void renderAnimation() {
-		if (!this.isMoving()) {
+		if (!this.isMoving() && !this.isDummy()) {
 			this.anim = 2;
 			this.counter = 0;
 			this.animUp = false;
@@ -98,7 +98,7 @@ public class PacMan extends LivingEntity {
 	}
 	
 	private void updateCounter(int interval) {
-		if (this.isMoving()) {
+		if (this.isMoving() || this.isDummy()) {
 			this.counter++;
 		
 			if (this.counter % interval == 0) {
@@ -116,5 +116,5 @@ public class PacMan extends LivingEntity {
 			}
 		}
 	}
-
+	
 }

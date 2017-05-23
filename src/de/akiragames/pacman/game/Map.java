@@ -157,7 +157,7 @@ public class Map {
 				for (int x = 0; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
 						if (pixels[x + y * this.pattern.getWidth()] == Color.RED.getRGB()) {
-							pm = new PacMan(x, y, this.game);
+							pm = new PacMan(x, y, this.game, false);
 							break;
 						}
 					}
@@ -217,7 +217,7 @@ public class Map {
 				for (int x = 0; x < this.pattern.getWidth(); x++) {
 					if (x >= 0 && x < this.game.getScreen().getWidth()) {
 						if (pixels[x + y * this.pattern.getWidth()] == Color.WHITE.getRGB()) {
-							Ghost ghost = new Ghost(x, y, this.game, ghostCount + 1);
+							Ghost ghost = new Ghost(x, y, this.game, false, ghostCount + 1);
 							Direction[] freeDirections = ghost.getFreeDirections(this);
 							
 							ghost.changeDirection(this, freeDirections[new Random().nextInt(freeDirections.length)]);
