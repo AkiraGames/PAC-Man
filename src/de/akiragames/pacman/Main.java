@@ -20,7 +20,7 @@ public class Main extends Canvas implements Runnable {
 	// Projekt-Parameter
 	public static final String NAME = "Project PAC-Man";
 	public static final String GAME_ID_REF = "PAC";
-	public static final String VERSION = "1.1.1";
+	public static final String VERSION = "1.1.2";
 
 	// Fenster-Parameter
 	public static final int WIDTH = 20 * 32;
@@ -53,7 +53,7 @@ public class Main extends Canvas implements Runnable {
 		this.screen = new Screen(this, WIDTH, HEIGHT);
 		this.frame = new JFrame();
 		
-		this.game = new Game(this.screen);
+		this.game = new Game(this);
 		
 		Main.keyboard = new Keyboard(this);
 		
@@ -161,6 +161,12 @@ public class Main extends Canvas implements Runnable {
 		
 		g.dispose();
 		bs.show();
+	}
+	
+	// Methode, um Programm neu zu starten
+	public void restart() {
+		this.screen = new Screen(this, WIDTH, HEIGHT);
+		this.game = new Game(this);
 	}
 
 	public static boolean isOutdated() {

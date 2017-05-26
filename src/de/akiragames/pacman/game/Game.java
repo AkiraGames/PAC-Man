@@ -24,12 +24,12 @@ public class Game {
 	
 	private int textSize = 25;
 	
-	private Screen screen;
+	private Main main;
 	private GameState gameState;
 	
 	private Map map;
 	
-	public Game(Screen screen) {
+	public Game(Main main) {
 		this.gameId = Utils.generateGameId();
 		this.gameScore = 0;
 		this.gameLevel = 1;
@@ -42,7 +42,7 @@ public class Game {
 		this.counter = 0;
 		
 		this.gameState = GameState.CHECK_UPDATES;
-		this.screen = screen;
+		this.main = main;
 		
 		this.playerName = "PACBOT";
 		
@@ -57,7 +57,7 @@ public class Game {
 		
 		this.temp = 5;
 		
-		this.screen.clearFull();
+		this.main.getScreen().clearFull();
 		this.map.renderWalls();
 	}
 	
@@ -121,6 +121,7 @@ public class Game {
 			System.err.println("Game stats could not be saved!");
 		}
 		
+		this.temp = Utils.unixTime();
 		this.gameState = GameState.SAVED_TO_DB;
 	}
 	
@@ -134,7 +135,7 @@ public class Game {
 			
 			this.updateDummy();
 		} else if (this.gameState == GameState.START_GAME) {
-			if (this.temp > 0 ) {
+			if (this.temp > 0) {
 				this.temp = 5 - (Utils.unixTime() - this.gameStart);
 			} else {
 				this.gameStart = Utils.unixTime();
@@ -156,21 +157,24 @@ public class Game {
 		} else if (this.gameState == GameState.POWERUP_ACTIVE) {
 			if (Utils.unixTime() - this.temp == 7)
 				this.gameState = GameState.IN_GAME;
+		} else if (this.gameState == GameState.SAVED_TO_DB) {
+			if (Utils.unixTime() - this.temp == 5)
+				this.main.restart();
 		}
 	}
 	
 	public void render() {
 		if (this.gameState == GameState.CHECK_UPDATES) {
-			this.screen.clearFull();
+			this.main.getScreen().clearFull();
 			this.renderCheckUpdatesScreen();
 		} else if (this.gameState == GameState.ENTER_NAME) {
-			this.screen.clearFull();
+			this.main.getScreen().clearFull();
 			this.renderEndScreen();
 		} else if (this.gameState == GameState.SAVED_TO_DB) {
-			this.screen.clearFull();
+			this.main.getScreen().clearFull();
 			this.renderRestartScreen();
 		} else {
-			this.screen.clearKeepWalls();
+			this.main.getScreen().clearKeepWalls();
 			this.map.render();
 			
 			if (this.gameState == GameState.START_GAME) {
@@ -202,65 +206,65 @@ public class Game {
 	}
 	
 	private void renderCheckUpdatesScreen() {
-		this.screen.renderText("AkiraGames presents", 200, 30, 20, Color.WHITE);
-		this.screen.renderCenteredImage(FileUtils.loadImages(new String[]{"text/title.png"})[0], 60, 1.0);
+		this.main.getScreen().renderCenteredText("AkiraGames presents", 30, 20, Color.WHITE);
+		this.main.getScreen().renderCenteredImage(FileUtils.loadImages(new String[]{"text/title.png"})[0], 60, 1.0);
 		this.dummy.renderAnimation();
 		
 		if (Main.newVersion.equalsIgnoreCase(Main.VERSION)) {
-			this.screen.renderText("Game is up to date.", 210, 250, 20, Color.GREEN);
-			if (this.anim % 5 < 3) this.screen.renderText(">> Press Enter to continue <<", 150, 290, 20, Color.CYAN);
+			this.main.getScreen().renderCenteredText("Game is up to date.", 250, 20, Color.GREEN);
+			if (this.anim % 5 < 3) this.main.getScreen().renderText(">> Press Enter to continue <<", 150, 290, 20, Color.CYAN);
 		} else {
-			this.screen.renderText("A new game version (" + Main.newVersion + ") is available!", 110, 250, 20, Color.RED);
-			this.screen.renderText("Go on 'akiragames.cynfos.de/PAC/' to download.", 110, 280, 15, Color.RED);
-			if (this.anim % 5 < 3) this.screen.renderText(">> Press Enter to continue <<", 150, 320, 20, Color.CYAN);
+			this.main.getScreen().renderCenteredText("A new game version (" + Main.newVersion + ") is available!", 250, 20, Color.RED);
+			this.main.getScreen().renderCenteredText("Go on 'akiragames.cynfos.de/PAC/' to download.", 280, 15, Color.RED);
+			if (this.anim % 5 < 3) this.main.getScreen().renderCenteredText(">> Press Enter to continue <<", 320, 20, Color.CYAN);
 		}
 	}
 	
 	private void renderRestartScreen() {
-		this.screen.renderText("Game has been saved if", 100, 100, 30, Color.CYAN);
-		this.screen.renderText("connected to the internet.", 100, 140, 30, Color.CYAN);
-		this.screen.renderText("Close window to quit game.", 100, 210, 30, Color.CYAN);
+		this.main.getScreen().renderCenteredText("Game has been saved if", 70, 30, Color.CYAN);
+		this.main.getScreen().renderCenteredText("connected to the internet.", 110, 30, Color.CYAN);
+		this.main.getScreen().renderCenteredText("Game-ID: " + this.gameId, 180, 30, Color.WHITE);
+		this.main.getScreen().renderCenteredText("Restart in " + (5 - (Utils.unixTime() - this.temp)) + "...", 250, 30, Color.RED);
 	}
 	
 	private void renderEndScreen() {
-		int nameLength = this.screen.getStringPixelLength(this.playerName, 30);
+		int nameLength = this.main.getScreen().getStringPixelLength(this.playerName, 30);
 		
-		this.screen.renderText("Please Enter Your Name:", 100, 100, 30, Color.CYAN);
-		this.screen.renderText(">> ", 100, 150, 30, Color.CYAN);
-		this.screen.renderText(this.playerName, 150, 150, 30, Color.YELLOW);
-		if (this.anim % 4 < 2) this.screen.renderText("|", 152 + nameLength, 145, 40, Color.CYAN);
-		this.screen.renderText("Press Enter to save your", 100, 220, 30, Color.CYAN);
-		this.screen.renderText("game.", 100, 260, 30, Color.CYAN);
-		this.screen.renderText("ID: " + this.gameId, 340, 260, 30, Color.WHITE);
+		this.main.getScreen().renderCenteredText("Please Enter Your Name:", 100, 30, Color.CYAN);
+		this.main.getScreen().renderText(">> ", 120, 150, 30, Color.CYAN);
+		this.main.getScreen().renderText(this.playerName, 165, 150, 30, Color.YELLOW);
+		if (this.anim % 4 < 2) this.main.getScreen().renderText("|", 170 + nameLength, 145, 40, Color.CYAN);
+		this.main.getScreen().renderCenteredText("Press Enter to save your", 220, 30, Color.CYAN);
+		this.main.getScreen().renderCenteredText("game.     (Game-ID: " + this.gameId + ")", 260, 30, Color.CYAN);
 	}
 	
 	private void renderDeathText() {
 		this.renderCenterText();
-		this.screen.renderText("You Died!", 240, 360, this.textSize + 5, Color.RED);
+		this.main.getScreen().renderCenteredText("You Died!", 357, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderGameOver() {
 		this.renderCenterText();
-		this.screen.renderText("Game Over!", 225, 360, this.textSize + 5, Color.RED);
+		this.main.getScreen().renderCenteredText("Game Over!", 357, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderNextLevelText() {
-		this.screen.renderText("You passed Level " + this.gameLevel + "!", 155, 360, this.textSize + 5, Color.RED);
+		this.main.getScreen().renderCenteredText("You passed Level " + this.gameLevel + "!", 357, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderStartText() {		
-		this.screen.renderText("Ready? | Start in " + this.temp + "...", 155, 360, this.textSize + 5, Color.RED);
+		this.main.getScreen().renderCenteredText("Ready? | Start in " + this.temp + "...", 357, this.textSize + 5, Color.RED);
 	}
 	
 	private void renderInformation() {
 		this.renderCenterText();
-		this.screen.renderText("Level: " + this.gameLevel, 195, 360, this.textSize, Color.WHITE);
-		this.screen.renderText("Time: " + (Utils.unixTime() - this.gameStart), 350, 360, this.textSize, this.gameState == GameState.IN_GAME ? Color.WHITE : Color.CYAN);
+		this.main.getScreen().renderText("Level: " + this.gameLevel, 195, 360, this.textSize, Color.WHITE);
+		this.main.getScreen().renderText("Time: " + (Utils.unixTime() - this.gameStart), 350, 360, this.textSize, this.gameState == GameState.IN_GAME ? Color.WHITE : Color.CYAN);
 	}
 	
 	private void renderCenterText() {
-		this.screen.renderText("Score: " + this.gameScore, 20, 360, this.textSize, Color.WHITE);
-		this.screen.renderText("Lives: " + this.lives, 525, 360, this.textSize, Color.WHITE);
+		this.main.getScreen().renderText("Score: " + this.gameScore, 20, 360, this.textSize, Color.WHITE);
+		this.main.getScreen().renderText("Lives: " + this.lives, 525, 360, this.textSize, Color.WHITE);
 	}
 	
 	public void activatePowerUp() {
@@ -306,7 +310,11 @@ public class Game {
 	}
 	
 	public Screen getScreen() {
-		return this.screen;
+		return this.main.getScreen();
+	}
+	
+	public Main getMain() {
+		return this.main;
 	}
 	
 	public Map getMap() {

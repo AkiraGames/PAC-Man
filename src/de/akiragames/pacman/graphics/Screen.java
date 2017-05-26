@@ -75,7 +75,7 @@ public class Screen {
 	 * Rendert einen Text.
 	 */
 	public void renderText(String text, int posX, int posY, int fontSize, Color fontColor) {
-		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize, BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = image.getGraphics();
 		
 		int w = image.getWidth();
@@ -103,6 +103,15 @@ public class Screen {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Rendert einen Text horizontal zentriert.
+	 */
+	public void renderCenteredText(String text, int posY, int fontSize, Color fontColor) {
+		int length = this.getStringPixelLength(text.toUpperCase(), fontSize);
+		
+		this.renderText(text, (this.width - length) / 2, posY, fontSize, fontColor);
 	}
 	
 	/**
@@ -163,7 +172,7 @@ public class Screen {
 	 * Gibt die schriftartabhängige Länge eines Textes zurück
 	 */
 	public int getStringPixelLength(String text, int fontSize) {
-		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize - fontSize / 5, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(Main.WIDTH, fontSize, BufferedImage.TYPE_INT_RGB);
 		Graphics graphics = image.getGraphics();
 		
 		int length = 0;
